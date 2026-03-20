@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Parse and explain cron expressions in plain English. Preview the next 5 run times for any schedule." />
+  <link rel="canonical" href="https://timestamp.mdothree.com/cron-parser" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Cron Parser — mdothree" />
+  <meta property="og:description" content="Parse and explain cron expressions in plain English. Preview the next 5 run times for any schedule." />
+  <meta property="og:url" content="https://timestamp.mdothree.com/cron-parser" />
+  <meta property="og:image" content="https://mdothree.com/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Cron Parser — mdothree" />
+  <meta name="twitter:description" content="Parse and explain cron expressions in plain English. Preview the next 5 run times for any schedule." />
+  <title>Cron Parser — mdothree</title>
+  <meta name="stripe-config" content='{"publishableKey":"REPLACE_WITH_STRIPE_PUBLISHABLE_KEY","priceIdMonthly":"REPLACE_WITH_STRIPE_PRICE_ID_MONTHLY","priceIdYearly":"REPLACE_WITH_STRIPE_PRICE_ID_YEARLY","portalUrl":"https://billing.stripe.com/p/login/REPLACE"}'>
+  <meta name="firebase-config" content='{"apiKey":"REPLACE_WITH_API_KEY","authDomain":"REPLACE.firebaseapp.com","projectId":"REPLACE_WITH_PROJECT_ID","storageBucket":"REPLACE.appspot.com","messagingSenderId":"REPLACE","appId":"REPLACE_WITH_APP_ID"}'>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#10B981" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" />
+  <link rel="preconnect" href="https://js.stripe.com" />
+  <link rel="preconnect" href="https://hooks.stripe.com" />
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="https://mdothree.com">m<span class="dot">.</span>3</a>
+    <nav class="tool-nav">
+      <a href="/">Unix</a>
+      <a href="/timezone-converter">Timezone</a>
+      <a href="/duration-calculator">Duration</a>
+      <a href="/age-calculator">Age</a>
+      <a href="/business-days">Business Days</a>
+      <a href="/countdown">Countdown</a>
+      <a href="/cron-parser" class="active">Cron</a>
+      <a href="https://mdothree.com/pro" class="pro-nav-link">★ Pro</a>
+    </nav>
+  </header>
+
+  <main class="tool-main">
+    <div class="tool-header">
+      <h1>Cron Expression Parser</h1>
+      <p>Parse and explain any cron expression, and preview upcoming run times. <strong>Pro feature.</strong></p>
+    </div>
+    <div class="tool-body">
+      <div>
+        <label class="field-label">
+          Cron Expression
+          <span class="field-label-sub">(minute hour dom month dow)</span>
+        </label>
+        <input type="text" id="cronInput" class="input-field input-field--mono" placeholder="e.g. 0 9 * * 1-5" value="0 9 * * 1-5" />
+      </div>
+      <div class="cron-parts" id="cronParts"></div>
+      <div class="action-row">
+        <button class="btn-primary" id="parseCronBtn">Parse</button>
+      </div>
+      <div class="output-panel" id="cronResult" hidden>
+        <div id="cronExplanation" class="cron-explanation"></div>
+        <label class="field-label">Next 5 Run Times</label>
+        <div id="nextRuns" class="next-runs-list"></div>
+      </div>
+      <div>
+        <label class="field-label section-label">Common Examples</label>
+        <div id="examples" class="cron-examples"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/pages/cron-parser.js" type="module"></script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

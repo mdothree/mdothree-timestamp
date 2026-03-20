@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Live countdown timer to any date or event. Displays days, hours, minutes, and seconds." />
+  <link rel="canonical" href="https://timestamp.mdothree.com/countdown" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Countdown Timer — mdothree" />
+  <meta property="og:description" content="Live countdown timer to any date or event. Displays days, hours, minutes, and seconds." />
+  <meta property="og:url" content="https://timestamp.mdothree.com/countdown" />
+  <meta property="og:image" content="https://mdothree.com/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Countdown Timer — mdothree" />
+  <meta name="twitter:description" content="Live countdown timer to any date or event. Displays days, hours, minutes, and seconds." />
+  <title>Countdown — mdothree</title>
+  <meta name="stripe-config" content='{"publishableKey":"REPLACE_WITH_STRIPE_PUBLISHABLE_KEY","priceIdMonthly":"REPLACE_WITH_STRIPE_PRICE_ID_MONTHLY","priceIdYearly":"REPLACE_WITH_STRIPE_PRICE_ID_YEARLY","portalUrl":"https://billing.stripe.com/p/login/REPLACE"}'>
+  <meta name="firebase-config" content='{"apiKey":"REPLACE_WITH_API_KEY","authDomain":"REPLACE.firebaseapp.com","projectId":"REPLACE_WITH_PROJECT_ID","storageBucket":"REPLACE.appspot.com","messagingSenderId":"REPLACE","appId":"REPLACE_WITH_APP_ID"}'>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#10B981" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" />
+  <link rel="preconnect" href="https://js.stripe.com" />
+  <link rel="preconnect" href="https://hooks.stripe.com" />
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="https://mdothree.com">m<span class="dot">.</span>3</a>
+    <nav class="tool-nav">
+      <a href="/">Unix</a>
+      <a href="/timezone-converter">Timezone</a>
+      <a href="/duration-calculator">Duration</a>
+      <a href="/age-calculator">Age</a>
+      <a href="/business-days">Business Days</a>
+      <a href="/countdown" class="active">Countdown</a>
+      <a href="/cron-parser">Cron</a>
+      <a href="https://mdothree.com/pro" class="pro-nav-link">★ Pro</a>
+    </nav>
+  </header>
+
+  <main class="tool-main">
+    <div class="tool-header">
+      <h1>Countdown Timer</h1>
+      <p>Live countdown to any date or event.</p>
+    </div>
+    <div class="tool-body">
+      <div>
+        <label class="field-label" for="cdTarget">Target Date &amp; Time</label>
+        <input type="datetime-local" id="cdTarget" class="input-field" />
+      </div>
+      <div>
+        <label class="field-label" for="cdLabel">Label (optional)</label>
+        <input type="text" id="cdLabel" class="input-field" placeholder="e.g. New Year 2026" />
+      </div>
+      <div class="action-row">
+        <button class="btn-primary" id="startCd">Start Countdown</button>
+        <button class="btn-ghost" id="stopCd" hidden>Stop</button>
+      </div>
+      <div class="output-panel" id="cdPanel" hidden>
+        <div id="cdTitle" class="countdown-label"></div>
+        <div class="countdown-display">
+          <div class="countdown-unit">
+            <span class="countdown-number" id="cdDays">0</span>
+            <span class="countdown-unit-label">Days</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-number" id="cdHours">0</span>
+            <span class="countdown-unit-label">Hours</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-number" id="cdMinutes">0</span>
+            <span class="countdown-unit-label">Minutes</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-number" id="cdSeconds">0</span>
+            <span class="countdown-unit-label">Seconds</span>
+          </div>
+        </div>
+        <div id="cdStatus" class="countdown-status"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/pages/countdown.js" type="module"></script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Convert date and time across any world timezone. Save timezone pairs as presets." />
+  <link rel="canonical" href="https://timestamp.mdothree.com/timezone-converter" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Timezone Converter — mdothree" />
+  <meta property="og:description" content="Convert date and time across any world timezone. Save timezone pairs as presets." />
+  <meta property="og:url" content="https://timestamp.mdothree.com/timezone-converter" />
+  <meta property="og:image" content="https://mdothree.com/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Timezone Converter — mdothree" />
+  <meta name="twitter:description" content="Convert date and time across any world timezone. Save timezone pairs as presets." />
+  <title>Timezone Converter — mdothree</title>
+  <meta name="stripe-config" content='{"publishableKey":"REPLACE_WITH_STRIPE_PUBLISHABLE_KEY","priceIdMonthly":"REPLACE_WITH_STRIPE_PRICE_ID_MONTHLY","priceIdYearly":"REPLACE_WITH_STRIPE_PRICE_ID_YEARLY","portalUrl":"https://billing.stripe.com/p/login/REPLACE"}'>
+  <meta name="firebase-config" content='{"apiKey":"REPLACE_WITH_API_KEY","authDomain":"REPLACE.firebaseapp.com","projectId":"REPLACE_WITH_PROJECT_ID","storageBucket":"REPLACE.appspot.com","messagingSenderId":"REPLACE","appId":"REPLACE_WITH_APP_ID"}'>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#10B981" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" />
+  <link rel="preconnect" href="https://js.stripe.com" />
+  <link rel="preconnect" href="https://hooks.stripe.com" />
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="https://mdothree.com">m<span class="dot">.</span>3</a>
+    <nav class="tool-nav">
+      <a href="/">Unix</a>
+      <a href="/timezone-converter" class="active">Timezone</a>
+      <a href="/duration-calculator">Duration</a>
+      <a href="/age-calculator">Age</a>
+      <a href="/business-days">Business Days</a>
+      <a href="/countdown">Countdown</a>
+      <a href="/cron-parser">Cron</a>
+      <a href="https://mdothree.com/pro" class="pro-nav-link">★ Pro</a>
+    </nav>
+  </header>
+
+  <main class="tool-main">
+    <div class="tool-header">
+      <h1>Timezone Converter</h1>
+      <p>Convert date/time across any world timezone. Save timezone pairs as presets with Pro.</p>
+    </div>
+    <div class="tool-body">
+      <div>
+        <label class="field-label">Date &amp; Time</label>
+        <input type="datetime-local" id="dtInput" class="input-field" />
+      </div>
+      <div class="tz-grid">
+        <div>
+          <label class="field-label" for="fromTz">From Timezone</label>
+          <select id="fromTz" class="input-field"></select>
+        </div>
+        <div>
+          <label class="field-label" for="toTz">To Timezone</label>
+          <select id="toTz" class="input-field"></select>
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="btn-primary" id="convertTz">Convert</button>
+        <button class="btn-ghost" id="swapTz">⇄ Swap</button>
+        <button class="btn-ghost" id="savePresetBtn">★ Save Preset</button>
+      </div>
+      <div class="output-panel" id="tzResult" hidden>
+        <div id="tzRows"></div>
+      </div>
+      <div>
+        <label class="field-label section-label">Saved Presets</label>
+        <div id="tzPresets" class="presets-list"></div>
+      </div>
+      <div>
+        <label class="field-label section-label">Current time in popular zones</label>
+        <div id="worldClocks" class="world-clocks-grid"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/pages/timezone-converter.js" type="module"></script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
