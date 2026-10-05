@@ -21,7 +21,7 @@
 
 const fs   = require('fs');
 const path = require('path');
-const glob = require('glob'); // node built-in via fs.readdirSync recursion below
+ // node built-in via fs.readdirSync recursion below
 
 // ── Collect env vars ──────────────────────────────────────────
 const required = [

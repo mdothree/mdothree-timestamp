@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Timestamp converter utility \u2014 mdothree.com",
   "scripts": {
-    "dev": "node scripts/inject-config.js && npx serve public",
-    "build": "node scripts/inject-config.js",
+    "dev": "node scripts/inject-config.cjs && npx serve public",
+    "build": "node scripts/inject-config.cjs",
     "start": "npx serve public",
     "test": "node --test --experimental-vm-modules tests/durationCalculator.test.js"
   },

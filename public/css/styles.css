@@ -144,3 +144,5 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--text-p
 .bd-add-val         { font-family: var(--font-mono); font-size: 1rem; margin-top: 6px; }
 
 .converter-title    { font-family: var(--font-display); font-size: 1rem; font-weight: 700; }
+
+.pro-nav-link { margin-left: auto; display: inline-flex; align-items: center; justify-content: center; gap: 4px; line-height: 1; background: linear-gradient(135deg,#10B981,#059669); color: #fff; border-radius: 99px; padding: 4px 12px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; text-decoration: none; white-space: nowrap; }
