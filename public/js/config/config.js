@@ -119,3 +119,12 @@ export {
   serverTimestamp, collection, addDoc, getDocs, query,
   where, orderBy, limit, deleteDoc, doc, setDoc, getDoc, updateDoc,
 };
+
+// ─────────────────────────────────────────────────────────────
+// 6. Pro plan + feature metadata
+//    Re-exported from stripe.js so callers that import from the
+//    single config entry point (e.g. services/paywallUI.js) can
+//    reach PLANS and proFeatureLabel without a second import path.
+// ─────────────────────────────────────────────────────────────
+
+export { PLANS, proFeatureLabel, PRO_FEATURES, requiresPro } from './stripe.js';

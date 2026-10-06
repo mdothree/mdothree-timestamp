@@ -3,6 +3,46 @@
 // Imported by all page JS files.
 
 /**
+ * Copy text to the clipboard. Uses the async Clipboard API when available
+ * (requires a secure context) and falls back to a hidden textarea +
+ * execCommand('copy') otherwise. Does NOT show a toast — callers decide
+ * what feedback to display based on the returned boolean.
+ *
+ * @param {string} text
+ * @returns {Promise<boolean>} true if the copy succeeded
+ */
+export async function copyToClipboard(text) {
+  const value = String(text ?? '');
+  // Preferred: async Clipboard API (needs HTTPS / localhost).
+  if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(value);
+      return true;
+    } catch {
+      // fall through to legacy path (e.g. permission denied / insecure ctx)
+    }
+  }
+  // Fallback: hidden textarea + execCommand('copy').
+  if (typeof document === 'undefined') return false;
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = value;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-9999px';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, value.length);
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Put a button into a loading state and return a restore function.
  * @param {HTMLButtonElement} btn
  * @param {string} [loadingText]
