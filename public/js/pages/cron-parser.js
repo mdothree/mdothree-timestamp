@@ -28,10 +28,13 @@ function renderParts(expr) {
   (parts.length === 5 ? parts : ['*', '*', '*', '*', '*']).forEach((p, i) => {
     const el = document.createElement('div');
     el.className = 'cron-part';
-    el.innerHTML = `
-      <div class="cron-part-label">${FIELD_LABELS[i]}</div>
-      <div class="cron-part-value">${p}</div>
-    `;
+    const lab = document.createElement('div');
+    lab.className = 'cron-part-label';
+    lab.textContent = FIELD_LABELS[i];
+    const val = document.createElement('div');
+    val.className = 'cron-part-value';
+    val.textContent = p; // user input — never innerHTML
+    el.append(lab, val);
     container.appendChild(el);
   });
 }

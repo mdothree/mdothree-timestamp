@@ -2,16 +2,19 @@
 import { calcDuration, addDuration, formatDuration } from '../services/durationCalculator.js';
 import { withLoading, showToast as uiToast, showError } from '../utils/ui-helpers.js';
 import { showToast, copyToClipboard }                from '../utils/dateUtils.js';
-import { initSubscription }                          from '../services/subscriptionService.js';
+import { initSubscription, onSubscriptionChange }    from '../services/subscriptionService.js';
 import { proBadge, handleStripeReturn }              from '../services/paywallUI.js';
 import { onAuthChange }                              from '../config/config.js';
 
 initSubscription();
 handleStripeReturn();
-onAuthChange(u => {
+// Pro badge only for a real Pro entitlement (anonymous sign-in is not Pro).
+onSubscriptionChange(status => {
   const nav = document.querySelector('.tool-nav');
   if (!nav) return;
-  if (u && !nav.querySelector('.pro-badge')) nav.appendChild(proBadge());
+  const existing = nav.querySelector('.pro-badge');
+  if (status.isPro && !existing) nav.appendChild(proBadge());
+  else if (!status.isPro && existing) existing.remove();
 });
 
 // ---- Default dates ----
@@ -49,8 +52,7 @@ document.getElementById('calcDur').addEventListener('click', () => {
       row.className = 'output-row';
       row.innerHTML = `<span class="output-row-label">${label}</span><span class="output-row-value">${value}</span>`;
       row.querySelector('.output-row-value').addEventListener('click', async () => {
-        await copyToClipboard(value);
-        showToast('Copied!');
+        showToast((await copyToClipboard(value)) ? 'Copied!' : 'Copy failed');
       });
       rows.appendChild(row);
     });
@@ -78,8 +80,7 @@ function doAdd(op) {
     const el = document.getElementById('addResultVal');
     el.textContent = result.toLocaleString() + ' — ' + result.toISOString();
     el.addEventListener('click', async () => {
-      await copyToClipboard(result.toISOString());
-      showToast('ISO date copied!');
+      showToast((await copyToClipboard(result.toISOString())) ? 'ISO date copied!' : 'Copy failed');
     });
   } catch (e) {
     showToast('Error: ' + e.message);

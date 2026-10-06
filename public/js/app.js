@@ -1,6 +1,6 @@
 // js/app.js — mdothree-timestamp (Firebase-integrated)
 
-import { unixToFormats, dateToFormats }    from './services/timestampConverter.js';
+import { unixToFormats, dateToFormats, detectUnit, UNIT_NAMES } from './services/timestampConverter.js';
 import { copyToClipboard, showToast }      from './utils/dateUtils.js';
 import {
   logConversion,
@@ -42,23 +42,41 @@ updateLive();
 setInterval(updateLive, 1000);
 
 document.getElementById('copyLiveTs')?.addEventListener('click', async () => {
-  await copyToClipboard(liveTs.textContent);
-  showToast('Copied!');
+  showToast((await copyToClipboard(liveTs.textContent)) ? 'Copied!' : 'Copy failed');
 });
 
 // ---- Timestamp -> Date ----
-document.getElementById('tsToDate')?.addEventListener('click', async () => {
-  const val  = document.getElementById('tsInput').value.trim();
-  const unit = document.getElementById('tsUnit').value;
+async function convertTs() {
+  const val    = document.getElementById('tsInput').value.trim();
+  const unitEl = document.getElementById('tsUnit');
+  const notice = document.getElementById('tsUnitNotice');
   if (!val) return;
+  // Auto-detect s / ms / µs / ns by digit count (e.g. a 13-digit Date.now() value is ms).
+  const detected = detectUnit(val);
+  let unit = unitEl.value;
+  if (notice) notice.hidden = true;
+  if (detected && detected !== unit) {
+    unit = detected;
+    if ([...unitEl.options].some(o => o.value === detected)) unitEl.value = detected;
+    if (notice) {
+      notice.textContent = `Interpreted as ${UNIT_NAMES[detected]} (${val.replace(/^-/, '').split('.')[0].length} digits).`;
+      notice.hidden = false;
+    }
+  }
+  let formats;
   try {
-    const formats = unixToFormats(parseFloat(val), unit);
+    formats = unixToFormats(parseFloat(val), unit);
     renderFormats('tsDateRows', 'tsDateOutput', formats);
+  } catch (e) { showToast('Error: ' + e.message); return; }
+  // History logging is best-effort and must not report an error for a successful conversion.
+  try {
     const summary = 'Unix ' + val + ' -> ' + formats['Local'];
     await logConversion({ type: 'unix', input: val, outputs: formats, summary });
     await loadAndRenderHistory();
-  } catch (e) { showToast('Error: ' + e.message); }
-});
+  } catch (e) { console.warn('[timestamp] history save failed', e); }
+}
+document.getElementById('tsToDate')?.addEventListener('click', convertTs);
+document.getElementById('tsInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') convertTs(); });
 
 // ---- Date -> Timestamp ----
 const dateInput = document.getElementById('dateInput');
@@ -68,17 +86,22 @@ if (dateInput) {
   dateInput.value = now.toISOString().slice(0, 16);
 }
 
-document.getElementById('dateToTs')?.addEventListener('click', async () => {
+async function convertDate() {
   const val = document.getElementById('dateInput').value;
   if (!val) return;
+  let formats;
   try {
-    const formats = dateToFormats(val);
+    formats = dateToFormats(val);
     renderFormats('dateRows', 'dateOutput', formats);
+  } catch (e) { showToast('Error: ' + e.message); return; }
+  try {
     const summary = val + ' -> ' + formats['Unix (seconds)'];
     await logConversion({ type: 'date', input: val, outputs: formats, summary });
     await loadAndRenderHistory();
-  } catch (e) { showToast('Error: ' + e.message); }
-});
+  } catch (e) { console.warn('[timestamp] history save failed', e); }
+}
+document.getElementById('dateToTs')?.addEventListener('click', convertDate);
+document.getElementById('dateInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') convertDate(); });
 
 // ---- Render format rows ----
 function renderFormats(rowsId, panelId, formats) {
@@ -90,11 +113,16 @@ function renderFormats(rowsId, panelId, formats) {
   Object.entries(formats).forEach(([label, value]) => {
     const row = document.createElement('div');
     row.className = 'output-row';
-    row.innerHTML =
-      '<span class="output-row-label">' + label + '</span>' +
-      '<span class="output-row-value" title="Click to copy">' + value + '</span>';
+    const lab = document.createElement('span');
+    lab.className = 'output-row-label';
+    lab.textContent = label;
+    const val = document.createElement('span');
+    val.className = 'output-row-value';
+    val.title = 'Click to copy';
+    val.textContent = value;
+    row.append(lab, val);
     row.querySelector('.output-row-value').addEventListener('click', async () => {
-      await copyToClipboard(value); showToast(label + ' copied!');
+      showToast((await copyToClipboard(value)) ? label + ' copied!' : 'Copy failed');
     });
     rows.appendChild(row);
   });
@@ -136,10 +164,14 @@ async function loadAndRenderHistory() {
   items.forEach(item => {
     const row = document.createElement('div');
     row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;font-size:0.8rem';
+    // Built with textContent: summary contains raw user input and must never be parsed as HTML.
     row.innerHTML =
-      '<span style="flex:1;font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + item.summary + '">' + item.summary + '</span>' +
-      '<span style="color:var(--text-secondary);white-space:nowrap">' + item.createdAt.toLocaleTimeString() + '</span>' +
-      '<button data-id="' + item.id + '" class="del-conv-btn" style="background:none;border:none;cursor:pointer;color:var(--text-secondary);padding:0 4px" title="Remove">x</button>';
+      '<span style="flex:1;font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>' +
+      '<span style="color:var(--text-secondary);white-space:nowrap"></span>' +
+      '<button class="del-conv-btn" style="background:none;border:none;cursor:pointer;color:var(--text-secondary);padding:0 4px" title="Remove">x</button>';
+    const [sumEl, timeEl] = row.querySelectorAll('span');
+    sumEl.textContent = sumEl.title = String(item.summary ?? '');
+    timeEl.textContent = item.createdAt?.toLocaleTimeString?.() ?? '';
     row.querySelector('.del-conv-btn').addEventListener('click', async e => {
       e.stopPropagation();
       await deleteConversionEntry(item.id);

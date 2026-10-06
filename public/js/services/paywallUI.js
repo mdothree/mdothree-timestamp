@@ -264,7 +264,7 @@ export async function openUpgradeModal(featureId = '') {
         </button>
 
         <div class="pw-legal">
-          By subscribing you agree to our <a href="/terms">Terms</a>.
+          By subscribing you agree to our <a href="https://mdothree.com/terms.html">Terms</a>.
           Cancel anytime. Powered by <a href="https://stripe.com" target="_blank" rel="noopener">Stripe</a>.
         </div>
         <a class="pw-manage-link" href="${STRIPE_CONFIG.portalUrl}" target="_blank" rel="noopener">

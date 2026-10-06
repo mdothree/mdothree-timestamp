@@ -3,7 +3,7 @@ import { COMMON_TIMEZONES, formatInTimezone, getUTCOffset, convertTimezone, getC
 import { withLoading, showToast as uiToast, showError } from '../utils/ui-helpers.js';
 import { showToast, copyToClipboard } from '../utils/dateUtils.js';
 import { saveTimezonePreset, loadTimezonePresets, deleteTimezonePreset } from '../services/conversionStorage.js';
-import { initSubscription } from '../services/subscriptionService.js';
+import { initSubscription, onSubscriptionChange } from '../services/subscriptionService.js';
 import { proGate, proBadge, handleStripeReturn } from '../services/paywallUI.js';
 import { onAuthChange, ensureAnonymousUser } from '../config/config.js';
 import { promptModal }                      from '../utils/inline-modal.js';
@@ -12,17 +12,24 @@ initSubscription();
 handleStripeReturn();
 ensureAnonymousUser().then(loadPresets);
 
-onAuthChange(u => {
+// Pro badge only for a real Pro entitlement (anonymous sign-in is not Pro).
+onSubscriptionChange(status => {
   const nav = document.querySelector('.tool-nav');
   if (!nav) return;
-  if (u && !nav.querySelector('.pro-badge')) nav.appendChild(proBadge());
+  const existing = nav.querySelector('.pro-badge');
+  if (status.isPro && !existing) nav.appendChild(proBadge());
+  else if (!status.isPro && existing) existing.remove();
 });
 
 // ---- Populate timezone selects ----
 const fromTzEl = document.getElementById('fromTz');
 const toTzEl   = document.getElementById('toTz');
 
-COMMON_TIMEZONES.forEach(tz => {
+// Make sure the browser's own zone is selectable even if it is not in the short list.
+const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+const tzList = COMMON_TIMEZONES.includes(browserTz) ? COMMON_TIMEZONES : [browserTz, ...COMMON_TIMEZONES];
+
+tzList.forEach(tz => {
   [fromTzEl, toTzEl].forEach(sel => {
     const opt = document.createElement('option');
     opt.value = tz;
@@ -31,7 +38,7 @@ COMMON_TIMEZONES.forEach(tz => {
   });
 });
 
-fromTzEl.value = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+fromTzEl.value = browserTz;
 toTzEl.value   = 'UTC';
 
 // ---- Default datetime-local ----
@@ -68,15 +75,14 @@ document.getElementById('convertTz').addEventListener('click', withLoading(docum
       row.className = 'output-row';
       row.innerHTML = `<span class="output-row-label">${label}</span><span class="output-row-value">${val}</span>`;
       row.querySelector('.output-row-value').addEventListener('click', async () => {
-        await copyToClipboard(val);
-        showToast('Copied!');
+        showToast((await copyToClipboard(val)) ? 'Copied!' : 'Copy failed');
       });
       rows.appendChild(row);
     });
   } catch (e) {
     showToast('Error: ' + e.message);
   }
-});
+}));
 
 // ---- Save preset (Pro) ----
 document.getElementById('savePresetBtn').addEventListener('click', async () => {

@@ -39,7 +39,7 @@
       <a href="/business-days">Business Days</a>
       <a href="/countdown">Countdown</a>
       <a href="/cron-parser">Cron</a>
-      <a href="https://mdothree.com/pro" class="pro-nav-link">★ Pro</a>
+      <a href="https://mdothree.com/pro.html" class="pro-nav-link">★ Pro</a>
     </nav>
   </header>
 
@@ -62,13 +62,14 @@
       <div class="converter-block">
         <div class="converter-title">Unix Timestamp → Date</div>
         <div class="converter-row">
-          <input type="number" id="tsInput" class="input-field" placeholder="e.g. 1700000000" / inputmode="numeric">
+          <input type="text" id="tsInput" class="input-field" placeholder="e.g. 1700000000 or 1700000000000" inputmode="numeric" autocomplete="off" spellcheck="false" />
           <select id="tsUnit" class="input-field" style="width:120px">
             <option value="s">Seconds</option>
             <option value="ms">Milliseconds</option>
           </select>
           <button class="btn-primary" id="tsToDate">Convert</button>
         </div>
+        <p class="unit-notice" id="tsUnitNotice" role="status" hidden></p>
         <div class="output-panel" id="tsDateOutput" style="display:none">
           <div id="tsDateRows"></div>
         </div>

@@ -76,6 +76,11 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--text-p
 .btn-primary:hover { background: var(--emerald-dark); }
 .btn-ghost { padding: 8px 16px; background: transparent; color: var(--text-secondary); border: 1.5px solid var(--border); border-radius: 8px; font-family: var(--font-body); font-size: 0.85rem; cursor: pointer; transition: all var(--transition); }
 .btn-ghost:hover { border-color: var(--text-primary); color: var(--text-primary); }
+/* Ghost button on the dark live card: default ghost colors are invisible (hover) / low-contrast there */
+.live-card .btn-ghost { color: var(--slate-300); border-color: rgba(203,213,225,0.45); }
+.live-card .btn-ghost:hover, .live-card .btn-ghost:focus-visible { color: #FFFFFF; border-color: #FFFFFF; }
+.unit-notice { font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px; }
+.unit-notice[hidden] { display: none; }
 .action-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 
 .section-divider { display: flex; align-items: center; gap: 12px; color: var(--text-secondary); font-size: 0.78rem; }

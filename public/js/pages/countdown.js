@@ -1,16 +1,19 @@
 // js/pages/countdown.js — Countdown Timer page logic
 import { startCountdown } from '../services/countdownTimer.js';
 import { withLoading, showToast as uiToast, showError } from '../utils/ui-helpers.js';
-import { initSubscription } from '../services/subscriptionService.js';
+import { initSubscription, onSubscriptionChange } from '../services/subscriptionService.js';
 import { proBadge, handleStripeReturn } from '../services/paywallUI.js';
 import { onAuthChange } from '../config/config.js';
 
 initSubscription();
 handleStripeReturn();
-onAuthChange(u => {
+// Pro badge only for a real Pro entitlement (anonymous sign-in is not Pro).
+onSubscriptionChange(status => {
   const nav = document.querySelector('.tool-nav');
   if (!nav) return;
-  if (u && !nav.querySelector('.pro-badge')) nav.appendChild(proBadge());
+  const existing = nav.querySelector('.pro-badge');
+  if (status.isPro && !existing) nav.appendChild(proBadge());
+  else if (!status.isPro && existing) existing.remove();
 });
 
 let stopFn = null;
