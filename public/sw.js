@@ -1,7 +1,7 @@
 // sw.js — Service Worker (generated — do not edit directly)
 // Cache-first for assets, network-first for HTML navigation.
 
-const CACHE_NAME = 'timestamp-v2';
+const CACHE_NAME = 'timestamp-v3';
 
 const PRECACHE_URLS = [
   '/',

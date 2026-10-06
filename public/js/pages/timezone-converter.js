@@ -111,10 +111,12 @@ async function loadPresets() {
     const row = document.createElement('div');
     row.className = 'preset-row';
     row.innerHTML = `
-      <span class="preset-name">${p.name}</span>
+      <span class="preset-name"></span>
       <button class="btn-ghost btn-xs load-preset-btn">Load</button>
-      <button class="del-btn" data-id="${p.id}" aria-label="Delete preset">✕</button>
+      <button class="del-btn" aria-label="Delete preset">✕</button>
     `;
+    // Preset name is user-typed: set via textContent, never parsed as HTML.
+    row.querySelector('.preset-name').textContent = String(p.name ?? '');
     row.querySelector('.load-preset-btn').addEventListener('click', () => {
       fromTzEl.value = p.fromTz;
       toTzEl.value   = p.toTz;

@@ -1,43 +1,54 @@
 // services/conversionStorage.js — mdothree-timestamp
-// Saves frequently used timestamp conversions and timezone pairs to Firestore.
+// Conversion history and timezone presets, stored ONLY in this browser
+// (localStorage, with an in-memory fallback). Nothing here is sent to
+// Firestore or any server: the privacy policy says tool input is processed
+// locally and not stored by us. The exported API is unchanged.
 
-import {
-  getDB, ensureAnonymousUser, getFirebaseAuth,
-  collection, addDoc, getDocs, query, where, orderBy, limit,
-  serverTimestamp, deleteDoc, doc,
-} from '../config/config.js';
+const CONVERSIONS_KEY = 'mdothree-timestamp:conversions';
+const PRESETS_KEY     = 'mdothree-timestamp:presets';
+const MAX_CONVERSIONS = 50;
+const MAX_PRESETS     = 20;
 
-const CONVERSIONS_COL = 'timestamp_conversions';
-const PRESETS_COL     = 'timestamp_presets';
+const _mem = { [CONVERSIONS_KEY]: [], [PRESETS_KEY]: [] };
 
-let _memConversions = [];
-let _memPresets     = [];
+function read(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) return arr;
+    }
+  } catch { /* storage blocked or corrupt: fall back to memory */ }
+  return _mem[key].slice();
+}
+
+function write(key, arr) {
+  _mem[key] = arr.slice();
+  try { localStorage.setItem(key, JSON.stringify(arr)); } catch { /* memory only */ }
+}
+
+function newId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
 
 // ---- Conversion History ----
 
 /**
- * Log a timestamp conversion to Firestore.
- * @param {{ type: 'unix'|'date', input: string, outputs: Object }} entry
+ * Record a timestamp conversion locally.
+ * @param {{ type: 'unix'|'date', input: string, outputs?: Object, summary?: string }} entry
  */
 export async function logConversion(entry) {
-  const user = await ensureAnonymousUser();
-  if (!user) {
-    _memConversions.unshift({ id: Date.now().toString(), ...entry, createdAt: new Date() });
-    if (_memConversions.length > 50) _memConversions.pop();
-    return;
-  }
-  try {
-    await addDoc(collection(getDB(), CONVERSIONS_COL), {
-      uid:       user.uid,
-      type:      entry.type,
-      input:     String(entry.input),
-      // Store a compact summary of outputs (avoid huge nested maps)
-      summary:   entry.summary ?? Object.entries(entry.outputs ?? {}).slice(0, 3).map(([k,v]) => `${k}: ${v}`).join(' · '),
-      createdAt: serverTimestamp(),
-    });
-  } catch (e) {
-    console.warn('[conversionStorage] log failed:', e.message);
-  }
+  const summary = entry.summary ??
+    Object.entries(entry.outputs ?? {}).slice(0, 3).map(([k, v]) => `${k}: ${v}`).join(' · ');
+  const list = read(CONVERSIONS_KEY);
+  list.unshift({
+    id:        newId(),
+    type:      entry.type,
+    input:     String(entry.input),
+    summary:   String(summary),
+    createdAt: Date.now(),
+  });
+  write(CONVERSIONS_KEY, list.slice(0, MAX_CONVERSIONS));
 }
 
 /**
@@ -45,96 +56,46 @@ export async function logConversion(entry) {
  * @param {number} [count=15]
  */
 export async function loadConversionHistory(count = 15) {
-  const user = getFirebaseAuth().currentUser;
-  if (!user) return _memConversions.slice(0, count);
-  try {
-    const q = query(
-      collection(getDB(), CONVERSIONS_COL),
-      where('uid', '==', user.uid),
-      orderBy('createdAt', 'desc'),
-      limit(count),
-    );
-    const snap = await getDocs(q);
-    return snap.docs.map(d => ({
-      id:        d.id,
-      type:      d.data().type,
-      input:     d.data().input,
-      summary:   d.data().summary,
-      createdAt: d.data().createdAt?.toDate?.() ?? new Date(),
-    }));
-  } catch (e) {
-    console.warn('[conversionStorage] load history failed:', e.message);
-    return _memConversions.slice(0, count);
-  }
+  return read(CONVERSIONS_KEY).slice(0, count).map(c => ({
+    ...c,
+    createdAt: new Date(c.createdAt || Date.now()),
+  }));
 }
 
 /**
  * Delete a conversion history entry.
  */
-export async function deleteConversionEntry(docId) {
-  const user = getFirebaseAuth().currentUser;
-  if (!user) { _memConversions = _memConversions.filter(c => c.id !== docId); return; }
-  try { await deleteDoc(doc(getDB(), CONVERSIONS_COL, docId)); }
-  catch (e) { console.warn('[conversionStorage] delete failed:', e.message); }
+export async function deleteConversionEntry(id) {
+  write(CONVERSIONS_KEY, read(CONVERSIONS_KEY).filter(c => c.id !== id));
 }
 
 // ---- Timezone Presets ----
 
 /**
- * Save a timezone pair as a user preset.
+ * Save a timezone pair as a preset.
  * @param {{ name: string, fromTz: string, toTz: string }} preset
  */
 export async function saveTimezonePreset(preset) {
-  const user = await ensureAnonymousUser();
-  if (!user) {
-    _memPresets.push({ id: Date.now().toString(), ...preset });
-    return;
-  }
-  try {
-    await addDoc(collection(getDB(), PRESETS_COL), {
-      uid:    user.uid,
-      name:   preset.name || `${preset.fromTz} → ${preset.toTz}`,
-      fromTz: preset.fromTz,
-      toTz:   preset.toTz,
-      createdAt: serverTimestamp(),
-    });
-  } catch (e) {
-    console.warn('[conversionStorage] save preset failed:', e.message);
-  }
+  const list = read(PRESETS_KEY);
+  list.unshift({
+    id:     newId(),
+    name:   preset.name || `${preset.fromTz} → ${preset.toTz}`,
+    fromTz: preset.fromTz,
+    toTz:   preset.toTz,
+  });
+  write(PRESETS_KEY, list.slice(0, MAX_PRESETS));
 }
 
 /**
- * Load timezone presets for the current user.
+ * Load saved timezone presets.
  */
 export async function loadTimezonePresets() {
-  const user = getFirebaseAuth().currentUser;
-  if (!user) return _memPresets;
-  try {
-    const q = query(
-      collection(getDB(), PRESETS_COL),
-      where('uid', '==', user.uid),
-      orderBy('createdAt', 'desc'),
-      limit(20),
-    );
-    const snap = await getDocs(q);
-    return snap.docs.map(d => ({
-      id:     d.id,
-      name:   d.data().name,
-      fromTz: d.data().fromTz,
-      toTz:   d.data().toTz,
-    }));
-  } catch (e) {
-    console.warn('[conversionStorage] load presets failed:', e.message);
-    return _memPresets;
-  }
+  return read(PRESETS_KEY);
 }
 
 /**
  * Delete a preset.
  */
-export async function deleteTimezonePreset(docId) {
-  const user = getFirebaseAuth().currentUser;
-  if (!user) { _memPresets = _memPresets.filter(p => p.id !== docId); return; }
-  try { await deleteDoc(doc(getDB(), PRESETS_COL, docId)); }
-  catch (e) { console.warn('[conversionStorage] delete preset failed:', e.message); }
+export async function deleteTimezonePreset(id) {
+  write(PRESETS_KEY, read(PRESETS_KEY).filter(p => p.id !== id));
 }

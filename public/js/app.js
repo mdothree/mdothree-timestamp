@@ -26,7 +26,7 @@ const authBadge = Object.assign(document.createElement('div'), {
   style: 'position:fixed;bottom:16px;right:16px;font-size:0.72rem;color:var(--text-secondary);font-family:var(--font-mono);z-index:999',
 });
 document.body.appendChild(authBadge);
-onAuthChange(u => { authBadge.textContent = u ? '🔥 syncing' : '☁ offline'; });
+onAuthChange(u => { authBadge.textContent = u ? '● signed in' : '○ offline'; });
 ensureAnonymousUser().then(() => loadAndRenderHistory());
 
 // ---- Live timestamp ----
@@ -128,7 +128,7 @@ function renderFormats(rowsId, panelId, formats) {
   });
 }
 
-// ---- Firebase history panel ----
+// ---- Local history panel (localStorage only; never uploaded) ----
 function ensureHistoryPanel() {
   if (document.getElementById('conversionHistoryPanel')) return;
   const main = document.querySelector('.tool-body');
@@ -138,7 +138,7 @@ function ensureHistoryPanel() {
   panel.className = 'output-panel';
   panel.innerHTML =
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">' +
-      '<label class="field-label" style="margin:0">Recent Conversions</label>' +
+      '<label class="field-label" style="margin:0">Recent Conversions <span style="font-weight:400;opacity:.7">(this browser only)</span></label>' +
       '<button id="clearConvHistory" class="btn-ghost" style="font-size:0.75rem;padding:4px 10px">Clear</button>' +
     '</div>' +
     '<div id="convHistoryList" style="display:flex;flex-direction:column;gap:6px"></div>';
