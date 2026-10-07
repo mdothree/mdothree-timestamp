@@ -63,7 +63,27 @@ export function getFirebaseApp() {
     appId:             CONFIG.appId             || '',
   };
   _app = getApps().length ? getApps()[0] : initializeApp(cfg);
+  initAppCheck(_app);
   return _app;
+}
+
+// App Check (OFF by default). Enable with window.__CONFIG / firebase-config meta:
+//   { ..., "appCheckEnabled": true, "appCheckSiteKey": "<reCAPTCHA Enterprise site key>" }
+// Register the key in Firebase console > App Check (mdo3d-utilities) and keep
+// enforcement OFF until the console shows verified traffic. Loaded lazily so pages
+// that never enable it don't download the module.
+let _appCheckStarted = false;
+function initAppCheck(app) {
+  if (_appCheckStarted) return;
+  _appCheckStarted = true;
+  const on = CONFIG.appCheckEnabled === true || CONFIG.appCheckEnabled === 'true';
+  if (!on || !CONFIG.appCheckSiteKey) return;
+  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js')
+    .then(({ initializeAppCheck, ReCaptchaEnterpriseProvider }) => initializeAppCheck(app, {
+      provider: new ReCaptchaEnterpriseProvider(CONFIG.appCheckSiteKey),
+      isTokenAutoRefreshEnabled: true,
+    }))
+    .catch(e => console.warn('[mdothree] App Check init failed:', e?.message));
 }
 
 export function getDB() {

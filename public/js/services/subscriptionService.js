@@ -12,8 +12,12 @@ let _cachedStatus = null;   // null | { isPro, plan, periodEnd, stripeCustomerId
 let _listeners    = [];
 
 // ---- Internal fetch ----
-async function fetchSubscriptionStatus(uid) {
+async function fetchSubscriptionStatus(user) {
+  const uid = user?.uid;
   if (!uid) return { isPro: false, plan: 'free' };
+  // Guest (anonymous) sessions are never Pro: their uid is per browser and per
+  // subdomain, and the API refuses to sell Pro to one (createSetupIntent).
+  if (user.isAnonymous) return { isPro: false, plan: 'free', reason: 'guest' };
   try {
     // Dynamic import to avoid hard crash if firebase isn't loaded yet
     const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
@@ -24,8 +28,11 @@ async function fetchSubscriptionStatus(uid) {
 
     const data = snap.data();
     const now  = Date.now();
+    // Written only by the Stripe webhook (Admin SDK); rules deny client writes.
     const periodEnd = data.currentPeriodEnd?.toMillis?.() ?? 0;
-    const active    = data.status === 'active' && periodEnd > now;
+    const active    = data.isPro === true
+                   && (data.status === 'active' || data.status === 'trialing')
+                   && periodEnd > now;
 
     return {
       isPro:             active,
@@ -51,7 +58,7 @@ export function initSubscription() {
   onAuthChange(async user => {
     _cachedStatus = null; // clear cache on auth change
     if (user) {
-      _cachedStatus = await fetchSubscriptionStatus(user.uid);
+      _cachedStatus = await fetchSubscriptionStatus(user);
     } else {
       _cachedStatus = { isPro: false, plan: 'free' };
     }
@@ -91,7 +98,7 @@ export async function isProAsync() {
       clearTimeout(timeout);
       unsub();
       if (!user) { resolve(false); return; }
-      const status = await fetchSubscriptionStatus(user.uid);
+      const status = await fetchSubscriptionStatus(user);
       _cachedStatus = status;
       resolve(status.isPro);
     });
@@ -111,7 +118,7 @@ export function getSubscriptionStatus() {
 export async function refreshSubscription() {
   const user = getFirebaseAuth().currentUser;
   if (!user) return;
-  _cachedStatus = await fetchSubscriptionStatus(user.uid);
+  _cachedStatus = await fetchSubscriptionStatus(user);
   _listeners.forEach(cb => cb(_cachedStatus));
   return _cachedStatus;
 }
