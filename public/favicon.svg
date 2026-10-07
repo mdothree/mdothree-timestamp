@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="8" fill="#0F172A"/>
-  <text x="4" y="23" font-family="monospace" font-size="16" font-weight="bold" fill="#FFFFFF">m</text>
-  <text x="16" y="23" font-family="monospace" font-size="16" font-weight="bold" fill="#10B981">.</text>
-  <text x="22" y="23" font-family="monospace" font-size="16" font-weight="bold" fill="#FFFFFF">3</text>
+  <!-- mdothree icon: Timestamp Converter. Source; rendered by landing/scripts/seo/build_seo.py -->
+  <rect rx="6" fill="#0F172A"/>
+  <text x="16.0" y="20.3" text-anchor="middle" font-family="JetBrains Mono" font-weight="800" font-size="11.9" fill="#10B981">UTC</text>
 </svg>

@@ -2,37 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://timestamp.mdothree.com/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
+    <lastmod>2026-10-07</lastmod>
   </url>
   <url>
     <loc>https://timestamp.mdothree.com/timezone-converter</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-10-07</lastmod>
   </url>
   <url>
     <loc>https://timestamp.mdothree.com/duration-calculator</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-10-07</lastmod>
   </url>
   <url>
     <loc>https://timestamp.mdothree.com/age-calculator</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-10-07</lastmod>
   </url>
   <url>
     <loc>https://timestamp.mdothree.com/business-days</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-10-07</lastmod>
   </url>
   <url>
     <loc>https://timestamp.mdothree.com/countdown</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-10-07</lastmod>
   </url>
   <url>
     <loc>https://timestamp.mdothree.com/cron-parser</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-10-07</lastmod>
   </url>
 </urlset>

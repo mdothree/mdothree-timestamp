@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- mdothree icon: Timestamp Converter. Source; rendered by landing/scripts/seo/build_seo.py -->
+  <rect width="512" height="512" rx="102" fill="#0F172A"/>
+  <text x="256.0" y="324.8" text-anchor="middle" font-family="JetBrains Mono" font-weight="800" font-size="191.1" fill="#10B981">UTC</text>
+</svg>
