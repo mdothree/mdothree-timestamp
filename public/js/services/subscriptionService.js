@@ -3,7 +3,7 @@
 // The source of truth is a Firestore doc written by the Stripe webhook Cloud Function.
 // Falls back gracefully (free tier) if Firebase or Firestore is unavailable.
 
-import { getFirebaseAuth, getDB, onAuthChange } from '../config/config.js';
+import { getFirebaseAuth, getDB, onAuthChange, doc, getDoc } from '../config/config.js';
 
 const SUBSCRIPTIONS_COL = 'subscriptions';
 
@@ -19,9 +19,9 @@ async function fetchSubscriptionStatus(user) {
   // subdomain, and the API refuses to sell Pro to one (createSetupIntent).
   if (user.isAnonymous) return { isPro: false, plan: 'free', reason: 'guest' };
   try {
-    // Dynamic import to avoid hard crash if firebase isn't loaded yet
-    const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    // Firebase is lazy/optional (HID-001): no SDK -> free tier, never a crash.
     const db   = getDB();
+    if (!db) return { isPro: false, plan: 'free', reason: 'offline' };
     const ref  = doc(db, SUBSCRIPTIONS_COL, uid);
     const snap = await getDoc(ref);
     if (!snap.exists()) return { isPro: false, plan: 'free' };
