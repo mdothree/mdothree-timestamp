@@ -189,6 +189,11 @@ export const STRIPE_CONFIG = {
 
 export const IS_TEST_MODE = STRIPE_CONFIG.publishableKey.startsWith('pk_test_');
 
+// #66b: Pro is not on sale until the operator turns this on (Vercel env
+// PRO_CHECKOUT_ENABLED=true -> stripe-config meta). Off: the upgrade modal says
+// "coming soon", shows no price and opens no Stripe checkout / payment link.
+export const PRO_CHECKOUT_ENABLED = CONFIG.PRO_CHECKOUT_ENABLED === true || CONFIG.PRO_CHECKOUT_ENABLED === 'true';
+
 // ─────────────────────────────────────────────────────────────
 // 5. Firestore helpers so callers import from one place.
 //    Thin delegates to the lazily loaded module; they throw (inside the

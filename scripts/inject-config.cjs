@@ -29,7 +29,7 @@ const firebaseKeys = [
 ];
 const stripeKeys = [
   'STRIPE_PUBLISHABLE_KEY', 'STRIPE_PRICE_ID_MONTHLY',
-  'STRIPE_PRICE_ID_YEARLY', 'STRIPE_CUSTOMER_PORTAL_URL',
+  'STRIPE_PRICE_ID_YEARLY', 'STRIPE_CUSTOMER_PORTAL_URL', 'PRO_CHECKOUT_ENABLED',
 ];
 
 // A config group is only injected when at least one of its env vars is present.
@@ -55,6 +55,7 @@ if (haveStripeEnv) {
     priceIdMonthly: process.env.STRIPE_PRICE_ID_MONTHLY      || '',
     priceIdYearly:  process.env.STRIPE_PRICE_ID_YEARLY       || '',
     portalUrl:      process.env.STRIPE_CUSTOMER_PORTAL_URL   || '',
+    PRO_CHECKOUT_ENABLED: process.env.PRO_CHECKOUT_ENABLED === 'true',  // #66b: closed unless exactly 'true'
   });
 }
 

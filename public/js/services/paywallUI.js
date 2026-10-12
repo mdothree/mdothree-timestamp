@@ -3,7 +3,7 @@
 // Also exports proGate() — call before any Pro feature to check and prompt.
 
 import { isPro, isProAsync, onSubscriptionChange, refreshSubscription } from './subscriptionService.js';
-import { STRIPE_CONFIG, PLANS, proFeatureLabel } from '../config/config.js';
+import { STRIPE_CONFIG, PLANS, proFeatureLabel, PRO_CHECKOUT_ENABLED } from '../config/config.js';
 import { getFirebaseAuth, ensureAnonymousUser } from '../config/config.js';
 
 // ---- Stripe.js lazy-load ----
@@ -282,6 +282,22 @@ export async function openUpgradeModal(featureId = '') {
   });
   document.getElementById('pw-close-btn').addEventListener('click', closeUpgradeModal);
 
+  if (!PRO_CHECKOUT_ENABLED) {
+    // #66b: Pro checkout isn't open. No plans, prices, payment form or payment link.
+    ['#pw-plan-toggle', '#pw-payment-element', '#pw-error', '.pw-legal', '.pw-manage-link']
+      .forEach(sel => _modalEl.querySelector(sel)?.remove());
+    _modalEl.querySelector('.pw-modal').setAttribute('aria-label', 'Pro is coming soon');
+    _modalEl.querySelector('.pw-badge').textContent = '⭐ mdothree Pro · coming soon';
+    _modalEl.querySelector('.pw-title').textContent = 'Pro is coming soon';
+    _modalEl.querySelector('.pw-subtitle').textContent =
+      "Pro checkout isn't open yet, so there is nothing to buy today. Planned for Pro:";
+    const locked = _modalEl.querySelector('.pw-locked-feature');
+    if (locked) locked.textContent = `🔒 ${featureLabel} will be part of Pro`;
+    document.getElementById('pw-submit-label').textContent = 'Pro coming soon';
+    document.getElementById('pw-submit-btn').setAttribute('aria-disabled', 'true');
+    return;
+  }
+
   // Plan toggle
   document.getElementById('pw-plan-toggle').addEventListener('click', e => {
     const btn = e.target.closest('[data-plan]');
@@ -481,7 +497,7 @@ export function lockElement(el, featureId, label) {
   lock.innerHTML = `
     <span style="font-size:1.4rem">🔒</span>
     <span class="pro-gate-lock-label">${label || proFeatureLabel(featureId)}</span>
-    <button class="pro-gate-lock-btn">Upgrade to Pro</button>
+    <button class="pro-gate-lock-btn">${PRO_CHECKOUT_ENABLED ? 'Upgrade to Pro' : 'Pro (coming soon)'}</button>
   `;
   lock.querySelector('.pro-gate-lock-btn').addEventListener('click', () => openUpgradeModal(featureId));
   el.style.position = 'relative';
