@@ -1,7 +1,7 @@
 // sw.js — Service Worker (generated — do not edit directly)
 // Cache-first for assets, network-first for HTML navigation.
 
-const CACHE_NAME = 'timestamp-v10';
+const CACHE_NAME = 'timestamp-v11';
 
 const PRECACHE_URLS = [
   '/',
@@ -20,7 +20,7 @@ const PRECACHE_URLS = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(PRECACHE_URLS))
+      .then(cache => cache.addAll(PRECACHE_URLS.map(u => new Request(u, { cache: 'reload' }))))
       .then(() => self.skipWaiting())
   );
 });
@@ -34,6 +34,10 @@ self.addEventListener('activate', event => {
       .then(() => self.clients.claim())
   );
 });
+
+// PERF-007: static assets carry a 1-day HTTP max-age, so the SW fills its cache with
+// revalidated copies (cache: 'reload' on install, 'no-cache' on a miss), never a stale HTTP-cache hit.
+const fresh = r => (r.mode === 'navigate' ? r : new Request(r, { cache: 'no-cache' }));
 
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
@@ -57,7 +61,7 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
-      return fetch(event.request).then(res => {
+      return fetch(fresh(event.request)).then(res => {
         if (!res || !res.ok) return res;
         caches.open(CACHE_NAME).then(c => c.put(event.request, res.clone()));
         return res;

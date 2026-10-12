@@ -40,6 +40,20 @@
   "redirects": [],
   "routes": [
     {
+      "src": "/(css|js)/(.*)",
+      "headers": {
+        "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800"
+      },
+      "continue": true
+    },
+    {
+      "src": "/(images|icons|fonts)/(.*)",
+      "headers": {
+        "Cache-Control": "public, max-age=2592000"
+      },
+      "continue": true
+    },
+    {
       "handle": "filesystem"
     },
     {
