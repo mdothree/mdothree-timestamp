@@ -77,7 +77,7 @@
         <div class="converter-title">Unix Timestamp → Date</div>
         <div class="converter-row">
           <input type="text" id="tsInput" class="input-field" placeholder="e.g. 1700000000 or 1700000000000" inputmode="numeric" autocomplete="off" spellcheck="false" />
-          <select id="tsUnit" class="input-field" style="width:120px">
+          <select aria-label="Timestamp unit" id="tsUnit" class="input-field" style="width:120px">
             <option value="s">Seconds</option>
             <option value="ms">Milliseconds</option>
           </select>
@@ -95,7 +95,7 @@
       <div class="converter-block">
         <div class="converter-title">Date / Time → Unix Timestamp</div>
         <div class="converter-row" style="flex-wrap:wrap">
-          <input type="datetime-local" id="dateInput" class="input-field" />
+          <input aria-label="Date and time to convert" type="datetime-local" id="dateInput" class="input-field" />
           <button class="btn-primary" id="dateToTs">Convert</button>
         </div>
         <div class="output-panel" id="dateOutput" style="display:none">
