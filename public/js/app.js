@@ -137,7 +137,7 @@ function ensureHistoryPanel() {
   panel.className = 'output-panel';
   panel.innerHTML =
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">' +
-      '<label class="field-label" style="margin:0">Recent Conversions <span style="font-weight:400;opacity:.7">(this browser only)</span></label>' +
+      '<label class="field-label" style="margin:0">Recent Conversions <span style="font-weight:400;color:var(--text-secondary)">(this browser only)</span></label>' +
       '<button id="clearConvHistory" class="btn-ghost" style="font-size:0.75rem;padding:4px 10px">Clear</button>' +
     '</div>' +
     '<div id="convHistoryList" style="display:flex;flex-direction:column;gap:6px"></div>';

@@ -128,40 +128,40 @@ function injectStyles() {
     .pw-plan-btn {
       flex: 1; border: none; background: transparent; border-radius: 7px;
       padding: 8px 0; font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
-      font-weight: 500; cursor: pointer; color: #64748B; transition: all 150ms;
+      font-weight: 500; cursor: pointer; color: #475569; transition: all 150ms;
       display: flex; flex-direction: column; align-items: center; gap: 2px;
     }
     .pw-plan-btn.active {
       background: #fff; color: #0F172A; font-weight: 600;
       box-shadow: 0 1px 6px rgba(0,0,0,0.1);
     }
-    .pw-plan-btn .pw-price { font-size: 1rem; font-weight: 700; color: #10B981; }
+    .pw-plan-btn .pw-price { font-size: 1rem; font-weight: 700; color: #047857; }
     .pw-plan-btn .pw-save-badge {
-      font-size: 0.65rem; background: #10B981; color: #fff;
+      font-size: 0.65rem; background: #047857; color: #fff;
       border-radius: 4px; padding: 1px 5px; margin-top: 2px;
     }
 
     /* Perks */
     .pw-perks { list-style: none; margin: 0 0 20px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
     .pw-perk { display: flex; align-items: flex-start; gap: 10px; font-size: 0.875rem; }
-    .pw-perk-icon { color: #10B981; font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .pw-perk-icon { color: #047857; font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
 
     /* Stripe Elements mount */
     #pw-payment-element { margin-bottom: 16px; min-height: 48px; }
     #pw-payment-element.pw-loading::after {
       content: 'Loading payment form…';
-      display: block; padding: 16px; color: #64748B; font-size: 0.85rem;
+      display: block; padding: 16px; color: #475569; font-size: 0.85rem;
       text-align: center;
     }
 
     .pw-submit {
-      width: 100%; padding: 14px; background: #10B981; color: #fff;
+      width: 100%; padding: 14px; background: #047857; color: #fff; /* A11Y-003: white text 5.5:1 (was 2.5:1) */
       border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif;
       font-size: 0.95rem; font-weight: 700; cursor: pointer; letter-spacing: 0.01em;
       transition: background 150ms, transform 100ms; display: flex;
       align-items: center; justify-content: center; gap: 8px;
     }
-    .pw-submit:hover:not(:disabled) { background: #059669; }
+    .pw-submit:hover:not(:disabled) { background: #065F46; }
     .pw-submit:active:not(:disabled) { transform: scale(0.99); }
     .pw-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -169,13 +169,13 @@ function injectStyles() {
     .pw-legal {
       text-align: center; font-size: 0.72rem; color: #94A3B8; margin-top: 12px;
     }
-    .pw-legal a { color: #10B981; text-decoration: none; }
+    .pw-legal a { color: #047857; text-decoration: underline; }
 
     .pw-manage-link {
       display: block; text-align: center; margin-top: 12px;
-      color: #64748B; font-size: 0.8rem; text-decoration: none;
+      color: #475569; font-size: 0.8rem; text-decoration: none;
     }
-    .pw-manage-link:hover { color: #10B981; }
+    .pw-manage-link:hover { color: #047857; }
 
     /* Pro badge shown in nav/header when active */
     .pro-badge {
@@ -197,11 +197,11 @@ function injectStyles() {
     }
     .pro-gate-lock-label { font-size: 0.85rem; font-weight: 600; color: #0F172A; }
     .pro-gate-lock-btn {
-      background: #10B981; color: #fff; border: none; border-radius: 8px;
+      background: #047857; color: #fff; border: none; border-radius: 8px; /* A11Y-003: 5.5:1 (was 2.5:1) */
       padding: 8px 18px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
       font-weight: 600; cursor: pointer; transition: background 150ms;
     }
-    .pro-gate-lock-btn:hover { background: #059669; }
+    .pro-gate-lock-btn:hover { background: #065F46; }
   `;
   document.head.appendChild(style);
 }
@@ -237,11 +237,11 @@ export async function openUpgradeModal(featureId = '') {
         <div class="pw-plan-toggle" id="pw-plan-toggle">
           <button class="pw-plan-btn active" data-plan="monthly">
             Monthly
-            <span class="pw-price">$4<span style="font-size:0.65rem;font-weight:500;color:#64748B">/mo</span></span>
+            <span class="pw-price">$4<span style="font-size:0.65rem;font-weight:500;color:#475569">/mo</span></span>
           </button>
           <button class="pw-plan-btn" data-plan="yearly">
             Yearly
-            <span class="pw-price">$3<span style="font-size:0.65rem;font-weight:500;color:#64748B">/mo</span></span>
+            <span class="pw-price">$3<span style="font-size:0.65rem;font-weight:500;color:#475569">/mo</span></span>
             <span class="pw-save-badge">Save 25%</span>
           </button>
         </div>
@@ -336,7 +336,7 @@ async function mountStripeElements() {
     mountEl.classList.remove('pw-loading');
     mountEl.innerHTML = `
       <div style="text-align:center;padding:16px 0">
-        <p style="font-size:0.875rem;color:#64748B;margin-bottom:12px">Click below to complete your subscription securely via Stripe Checkout.</p>
+        <p style="font-size:0.875rem;color:#475569;margin-bottom:12px">Click below to complete your subscription securely via Stripe Checkout.</p>
       </div>
     `;
     const submitBtn = document.getElementById('pw-submit-btn');
