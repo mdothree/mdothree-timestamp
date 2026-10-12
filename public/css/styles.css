@@ -186,3 +186,11 @@ nav.footer-legal a { display: inline-flex; align-items: center; min-height: 44px
 /* A11Y-015: skip link, first focusable element, visible on keyboard focus (#fff on #0F172A) */
 .skip-link { position: absolute; left: 8px; top: -100px; z-index: 1000; background: #0F172A; color: #fff; padding: 10px 14px; border-radius: 6px; font-weight: 600; text-decoration: none; }
 .skip-link:focus { top: 8px; }
+
+/* MDOTHREE-HSCROLL: datetime-local inputs have a ~240px intrinsic min width, and grid items default
+   to min-width:auto, so the 1fr 1fr Start/End grid pushed the page to 516px at phone width.
+   Let the cells shrink and stack the two-up grids on phones. */
+.dur-grid > *, .tz-grid > * { min-width: 0; }
+@media (max-width: 640px) {
+  .dur-grid, .tz-grid { grid-template-columns: 1fr; }
+}
