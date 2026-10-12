@@ -23,7 +23,7 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--text-p
   position: sticky; top: 0; z-index: 100; overflow-x: auto;
 }
 .logo { font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; color: var(--text-primary); text-decoration: none; letter-spacing: -0.02em; white-space: nowrap; }
-.logo .dot { color: var(--emerald); }
+.logo .dot { color: #047857; } /* A11Y-003: wordmark 5.5:1 on white (was #10B981 2.5:1) */
 .tool-nav { display: flex; gap: 2px; }
 .tool-nav a { font-size: 0.8rem; font-weight: 500; padding: 5px 10px; border-radius: 6px; text-decoration: none; color: var(--text-secondary); white-space: nowrap; transition: background var(--transition), color var(--transition); }
 .tool-nav a:hover { background: var(--surface); color: var(--text-primary); }
