@@ -160,3 +160,19 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--text-p
   .tool-nav { flex: 1 1 100%; flex-wrap: wrap; overflow-x: visible; min-width: 0; }
   .tool-nav a { padding: 8px 10px; }
 }
+
+/* C7B-PRO-BTN-INVISIBLE: `.tool-nav a` (0,1,1) used to override the Pro pill's white text,
+   leaving grey/green-on-green. Higher specificity + a darker green keep white text ≥4.5:1
+   (#fff on #047857 = 5.5:1, on #065F46 = 7.7:1). */
+.tool-nav a.pro-nav-link,
+.tool-nav a.pro-nav-link:hover,
+.tool-nav a.pro-nav-link:focus-visible { background: linear-gradient(135deg,#047857,#065F46); color: #fff; }
+.tool-nav a.pro-nav-link:hover { background: #065F46; }
+
+/* QW1 follow-up (C7-009): legal/contact footer. The page CSP blocks inline styles, so it is styled
+   here — centered, muted (#64748B on #fff = 4.8:1), spacing in line with the json/text tools. */
+footer.footer-legal { max-width: none; margin: 0; padding: 32px 24px; border-top: 1px solid var(--border, #CBD5E1); text-align: center; }
+nav.footer-legal { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 12px; font-family: var(--font-mono, monospace); font-size: 0.78rem; color: #64748B; }
+nav.footer-legal a { color: #64748B; text-decoration: none; }
+nav.footer-legal a:hover,
+nav.footer-legal a:focus-visible { color: var(--text-primary, #0F172A); text-decoration: underline; }

@@ -40,8 +40,9 @@ export function unixToFormats(ts, unit = 's') {
     'Time only':  d.toLocaleTimeString(),
     'Unix (s)':   Math.floor(ms / 1000).toString(),
     'Unix (ms)':  ms.toString(),
-    'Day of week': d.toLocaleDateString('en-US', { weekday: 'long' }),
-    'Week of year': getWeekNumber(d).toString(),
+    // C7B-TS-WEEK: computed in UTC so they agree with the UTC/ISO rows above (they used local time).
+    'Day of week (UTC)': d.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' }),
+    'ISO week (UTC)': getIsoWeekUTC(d),
   };
 }
 
@@ -67,9 +68,14 @@ export function dateToFormats(date) {
   };
 }
 
-function getWeekNumber(d) {
-  const onejan = new Date(d.getFullYear(), 0, 1);
-  return Math.ceil((((d - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+/** ISO 8601 week of the UTC date, e.g. "1970-W01" (weeks start Monday; week 1 holds the first Thursday). */
+function getIsoWeekUTC(d) {
+  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const dow = t.getUTCDay() || 7;            // Mon=1 … Sun=7
+  t.setUTCDate(t.getUTCDate() + 4 - dow);    // Thursday of this week decides the year
+  const yearStart = Date.UTC(t.getUTCFullYear(), 0, 1);
+  const week = Math.ceil(((t - yearStart) / 86400000 + 1) / 7);
+  return `${t.getUTCFullYear()}-W${String(week).padStart(2, '0')}`;
 }
 
 /**
