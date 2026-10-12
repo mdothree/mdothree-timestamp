@@ -194,3 +194,15 @@ nav.footer-legal a { display: inline-flex; align-items: center; min-height: 44px
 @media (max-width: 640px) {
   .dur-grid, .tz-grid { grid-template-columns: 1fr; }
 }
+
+
+/* MOBILE-TAPTARGETS-MDOTHREE-TOOLS: 44px tap targets for tool controls on phones */
+@media (max-width: 640px) {
+  .logo, .nav-logo { display: inline-flex; align-items: center; min-height: 44px; }
+  main button, main select, main input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]) { min-height: 44px; }
+  main button { min-width: 44px; }
+  main a[id], main a[class*="btn"], main a[class*="link"] { display: inline-flex; align-items: center; min-height: 44px; }
+  main input[type="checkbox"], main input[type="radio"] { width: 24px; height: 24px; }
+  .del-btn { min-width: 44px !important; min-height: 44px !important; }
+  nav.footer-legal a { min-width: 44px; justify-content: center; }
+}
