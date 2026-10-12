@@ -13,7 +13,7 @@
         "Referrer-Policy": "strict-origin-when-cross-origin",
         "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(self)",
         "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
-        "Content-Security-Policy": "default-src 'self'; script-src 'self' https://static.cloudflareinsights.com 'sha256-QJqTyFI88R5bax/6MO6XaZxrdOo2jOLCWZvU65oZ/tY=' https://js.stripe.com https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://cloudflareinsights.com https://*.firebaseio.com https://*.googleapis.com https://api.stripe.com https://api.pwnedpasswords.com wss://*.firebaseio.com; frame-src https://js.stripe.com https://hooks.stripe.com; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; form-action 'self' https://stripe.com"
+        "Content-Security-Policy": "default-src 'self'; script-src 'self' https://static.cloudflareinsights.com 'sha256-QJqTyFI88R5bax/6MO6XaZxrdOo2jOLCWZvU65oZ/tY=' https://js.stripe.com https://cdnjs.cloudflare.com https://www.gstatic.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://cloudflareinsights.com https://*.firebaseio.com https://*.googleapis.com https://api.stripe.com https://api.pwnedpasswords.com wss://*.firebaseio.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com/g/collect; frame-src https://js.stripe.com https://hooks.stripe.com; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; form-action 'self' https://stripe.com"
       },
       "continue": true
     },
