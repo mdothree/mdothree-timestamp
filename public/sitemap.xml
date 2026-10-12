@@ -2,30 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://timestamp.mdothree.com/</loc>
-    <lastmod>2026-10-07</lastmod>
   </url>
   <url>
     <loc>https://timestamp.mdothree.com/timezone-converter</loc>
-    <lastmod>2026-10-07</lastmod>
   </url>
   <url>
     <loc>https://timestamp.mdothree.com/duration-calculator</loc>
-    <lastmod>2026-10-07</lastmod>
   </url>
   <url>
     <loc>https://timestamp.mdothree.com/age-calculator</loc>
-    <lastmod>2026-10-07</lastmod>
   </url>
   <url>
     <loc>https://timestamp.mdothree.com/business-days</loc>
-    <lastmod>2026-10-07</lastmod>
   </url>
   <url>
     <loc>https://timestamp.mdothree.com/countdown</loc>
-    <lastmod>2026-10-07</lastmod>
   </url>
   <url>
     <loc>https://timestamp.mdothree.com/cron-parser</loc>
-    <lastmod>2026-10-07</lastmod>
   </url>
 </urlset>
