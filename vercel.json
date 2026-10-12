@@ -32,6 +32,13 @@
       "continue": true
     },
     {
+      "src": "/(terms|privacy)/?",
+      "status": 308,
+      "headers": {
+        "Location": "https://mdothree.com/$1"
+      }
+    },
+    {
       "handle": "filesystem"
     },
     {

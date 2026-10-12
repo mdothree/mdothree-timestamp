@@ -12,10 +12,10 @@ function loadStripeConfig() {
     if (meta) { try { return JSON.parse(meta.content); } catch {} }
   }
   return {
-    publishableKey: 'REPLACE_WITH_STRIPE_PUBLISHABLE_KEY',
-    priceIdMonthly: 'REPLACE_WITH_STRIPE_PRICE_ID_MONTHLY',  // e.g. price_1ABC...
-    priceIdYearly:  'REPLACE_WITH_STRIPE_PRICE_ID_YEARLY',   // e.g. price_1XYZ...
-    portalUrl:      'https://billing.stripe.com/p/login/REPLACE', // customer portal link
+    publishableKey: '',   // set via <meta name="stripe-config">; empty = checkout fails closed
+    priceIdMonthly: '',  // e.g. price_1ABC...
+    priceIdYearly:  '',   // e.g. price_1XYZ...
+    portalUrl:      '', // customer portal link
   };
 }
 

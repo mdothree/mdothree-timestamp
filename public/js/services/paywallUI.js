@@ -51,7 +51,7 @@ function injectTestModeBanner() {
   });
   banner.textContent = IS_CONFIGURED
     ? '⚠ STRIPE TEST MODE — payments will not be charged'
-    : '⚠ CONFIG NOT SET — replace REPLACE_WITH_* values in meta tags';
+    : '⚠ CONFIG NOT SET — Firebase/Stripe config meta tags are missing';
   document.body.prepend(banner);
 }
 
