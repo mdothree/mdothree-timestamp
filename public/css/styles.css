@@ -182,3 +182,7 @@ nav.footer-legal a { display: inline-flex; align-items: center; min-height: 44px
 @media (max-width: 640px) {
   .tool-nav a { display: inline-flex; align-items: center; min-height: 44px; }
 }
+
+/* A11Y-015: skip link, first focusable element, visible on keyboard focus (#fff on #0F172A) */
+.skip-link { position: absolute; left: 8px; top: -100px; z-index: 1000; background: #0F172A; color: #fff; padding: 10px 14px; border-radius: 6px; font-weight: 600; text-decoration: none; }
+.skip-link:focus { top: 8px; }
