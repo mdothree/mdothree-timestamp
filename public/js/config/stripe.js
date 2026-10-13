@@ -27,7 +27,6 @@ export const STRIPE_CONFIG = loadStripeConfig();
 export const PLANS = {
   free: {
     name:  'Basic',
-    price: '$0/mo',
     color: '#64748B',
   },
   pro: {
