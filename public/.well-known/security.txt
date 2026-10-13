@@ -1,4 +1,4 @@
-Contact: mailto:security@mdothree.com
+Contact: mailto:hello@mdothree.com
 Expires: 2027-10-12T00:00:00Z
 Preferred-Languages: en
 Canonical: https://timestamp.mdothree.com/.well-known/security.txt
