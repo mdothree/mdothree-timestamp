@@ -70,6 +70,10 @@
       margin-bottom: 48px; letter-spacing: -0.02em;
     }
     .logo span { color: var(--emerald); }
+    .legal { margin-top: 40px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 8px;
+      font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--slate-500); }
+    .legal a { color: var(--slate-500); text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; }
+    .legal a:hover, .legal a:focus-visible { color: var(--slate-900); text-decoration: underline; }
   </style>
   <link rel="preload" href="/fonts/syne-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
@@ -89,6 +93,7 @@
     <h1>Page not found</h1>
     <p>The page you're looking for doesn't exist or may have moved.</p>
     <a class="btn" href="/">← Back to home</a>
+    <nav class="legal" aria-label="Legal and contact"><a href="https://mdothree.com/terms">Terms</a> <span aria-hidden="true">·</span> <a href="https://mdothree.com/privacy">Privacy</a> <span aria-hidden="true">·</span> <a href="https://mdothree.com/refund">Refunds</a> <span aria-hidden="true">·</span> <a href="https://mdothree.com/acceptable-use">Acceptable Use</a> <span aria-hidden="true">·</span> <a href="https://mdothree.com/contact">Contact</a></nav>
   </div>
   <script src="/js/site-chrome.js" defer></script>
   <script type="module" src="/js/auth-nav.js"></script>
