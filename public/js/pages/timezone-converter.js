@@ -5,12 +5,12 @@ import { showToast, copyToClipboard } from '../utils/dateUtils.js';
 import { saveTimezonePreset, loadTimezonePresets, deleteTimezonePreset } from '../services/conversionStorage.js';
 import { initSubscription, onSubscriptionChange } from '../services/subscriptionService.js';
 import { proGate, proBadge, handleStripeReturn } from '../services/paywallUI.js';
-import { onAuthChange, ensureAnonymousUser } from '../config/config.js';
+import { onAuthChange, restoreSession } from '../config/config.js';
 import { promptModal }                      from '../utils/inline-modal.js';
 
 initSubscription();
 handleStripeReturn();
-ensureAnonymousUser().then(loadPresets);
+restoreSession().then(loadPresets);
 
 // Pro badge only for a real Pro entitlement (anonymous sign-in is not Pro).
 onSubscriptionChange(status => {

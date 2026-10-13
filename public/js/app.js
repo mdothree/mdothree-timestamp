@@ -7,7 +7,7 @@ import {
   loadConversionHistory,
   deleteConversionEntry,
 } from './services/conversionStorage.js';
-import { ensureAnonymousUser } from './config/config.js';
+import { restoreSession } from './config/config.js';
 import { initSubscription, onSubscriptionChange } from './services/subscriptionService.js';
 import { proGate, proBadge, handleStripeReturn } from './services/paywallUI.js';
 initSubscription();
@@ -20,7 +20,7 @@ onSubscriptionChange(status => {
   else if (!status.isPro && existing) existing.remove();
 });
 
-ensureAnonymousUser().then(() => loadAndRenderHistory());
+restoreSession().then(() => loadAndRenderHistory());
 
 // ---- Live timestamp ----
 const liveTs   = document.getElementById('liveTs');

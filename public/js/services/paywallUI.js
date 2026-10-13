@@ -4,7 +4,7 @@
 
 import { isPro, isProAsync, onSubscriptionChange, refreshSubscription } from './subscriptionService.js';
 import { STRIPE_CONFIG, PLANS, proFeatureLabel, PRO_CHECKOUT_ENABLED } from '../config/config.js';
-import { getFirebaseAuth, ensureAnonymousUser } from '../config/config.js';
+import { getFirebaseAuth, ensureAnonymousUser, loadFirebase } from '../config/config.js';
 
 // ---- Stripe.js lazy-load ----
 let _stripe = null;
@@ -218,6 +218,7 @@ let _selectedPlan = 'monthly';
 export async function openUpgradeModal(featureId = '') {
   injectStyles();
   if (_modalEl) return; // already open
+  loadFirebase(); // PERF-002: the Pro UI is where the SDK loads on demand
 
   const featureLabel = featureId ? proFeatureLabel(featureId) : 'Pro features';
 

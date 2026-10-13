@@ -12,6 +12,13 @@
 // failed and every tool page was dead and silent. Now the tool core never depends
 // on Firebase: when the SDK cannot load, auth reports "no user", Pro features stay
 // on the free tier, and history falls back to this browser.
+//
+// PERF-002: the SDK is not even requested on a plain visit. It loads only when
+//   - this browser already has a Firebase session here (restored on load), or
+//   - the visitor comes back from checkout (?stripe_success=1), or
+//   - the visitor opens the account / Pro UI or saves something to their account
+//     (loadFirebase() / ensureAnonymousUser() called from that action).
+// A first visit therefore downloads no gstatic SDK and no auth iframe.
 
 const SDK = 'https://www.gstatic.com/firebasejs/10.12.0/';
 
@@ -55,6 +62,39 @@ if (!IS_CONFIGURED && typeof document !== 'undefined') {
 let _sdk = null;          // { app, fs, auth } modules once loaded
 let _sdkPromise = null;
 let _app, _db, _auth;
+let _deferred = [];       // onAuthChange listeners waiting for an on-demand load
+
+// Set while this browser holds a Firebase user on this origin (kept in sync by
+// loadFirebase); lets the next visit restore the session without guessing.
+const SESSION_MARK = 'mdo:fb-session';
+function markSession(on) {
+  try { if (on) localStorage.setItem(SESSION_MARK, '1'); else localStorage.removeItem(SESSION_MARK); } catch { /* storage blocked */ }
+}
+
+let _wantPromise = null;
+/**
+ * Should this page load restore Firebase state up front? True when a session
+ * exists here (our marker, or the SDK's own IndexedDB store from an earlier
+ * version that signed every visitor in anonymously) or on a checkout return.
+ * Never loads the SDK itself.
+ */
+export function wantsFirebaseOnLoad() {
+  if (!_wantPromise) {
+    _wantPromise = (async () => {
+      if (_sdkPromise) return true;
+      try { if (localStorage.getItem(SESSION_MARK) === '1') return true; } catch { /* storage blocked */ }
+      try { if (new URLSearchParams(location.search).get('stripe_success') === '1') return true; } catch { /* no location */ }
+      try {
+        if (typeof indexedDB !== 'undefined' && indexedDB.databases) {
+          const dbs = await indexedDB.databases();
+          return dbs.some(d => d && d.name === 'firebaseLocalStorageDb');
+        }
+      } catch { /* not supported */ }
+      return false;
+    })();
+  }
+  return _wantPromise;
+}
 
 /**
  * Load the Firebase SDK on demand. Resolves to the module set, or null when the
@@ -69,6 +109,8 @@ export function loadFirebase() {
     ]).then(([app, fs, auth]) => {
       _sdk = { app, fs, auth };
       getFirebaseApp();
+      try { auth.onAuthStateChanged(getFirebaseAuth(), u => markSession(!!u)); } catch { /* ignore */ }
+      _deferred.splice(0).forEach(fn => fn(_sdk));
       return _sdk;
     }).catch(e => {
       _sdk = null;
@@ -133,13 +175,30 @@ const NO_AUTH = Object.freeze({ currentUser: null });
 export function getFirebaseAuth() {
   if (_auth) return _auth;
   if (!_sdk) return NO_AUTH;
-  _auth = _sdk.auth.getAuth(getFirebaseApp());
+  // initializeAuth without a popup/redirect resolver: these surfaces have no
+  // popup sign-in, so skip the ~93KB <authDomain>/__/auth/iframe.js that
+  // getAuth() preloads (CSP frame-src never allowed it anyway).
+  const a = _sdk.auth, app = getFirebaseApp();
+  try {
+    _auth = a.initializeAuth(app, { persistence: [a.indexedDBLocalPersistence, a.browserLocalPersistence] });
+  } catch {
+    _auth = a.getAuth(app); // already initialised elsewhere on this page
+  }
   return _auth;
 }
 
 // ─────────────────────────────────────────────────────────────
 // 3. Auth helpers
 // ─────────────────────────────────────────────────────────────
+
+/**
+ * Page-load hook: restore an existing session (and its saved data) only when
+ * this browser already has one. Resolves to the user or null; never loads the
+ * SDK for a first-time visitor.
+ */
+export async function restoreSession() {
+  return (await wantsFirebaseOnLoad()) ? ensureAnonymousUser() : null;
+}
 
 export async function ensureAnonymousUser() {
   const sdk = await loadFirebase();
@@ -162,7 +221,7 @@ export async function ensureAnonymousUser() {
 export function onAuthChange(cb) {
   let cancelled = false;
   let unsub = null;
-  loadFirebase().then(sdk => {
+  const attach = sdk => {
     if (cancelled) return;
     if (!sdk) { cb(null); return; }
     try {
@@ -172,6 +231,14 @@ export function onAuthChange(cb) {
       console.warn('[mdothree] auth listener failed:', e?.message);
       cb(null);
     }
+  };
+  wantsFirebaseOnLoad().then(want => {
+    if (cancelled) return;
+    if (want || _sdk) { loadFirebase().then(attach); return; }
+    // No session in this browser: report "signed out" now and attach for real
+    // if the visitor later opens the account / Pro UI (loadFirebase()).
+    cb(null);
+    _deferred.push(attach);
   });
   return () => { cancelled = true; if (unsub) unsub(); };
 }
