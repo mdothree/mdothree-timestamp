@@ -1,0 +1,145 @@
+/* site-chrome.css — MDOThree shared template (source: shared/mdothree/site-chrome.css; copy to each surface's /css/).
+   The right-hand nav cluster (Pro control, account, theme toggle). It carries its own colour tokens so the
+   cluster looks and contrasts the same on all 10 surfaces, whatever the surface's own palette.
+   Contrast (WCAG AA, text >= 4.5:1):
+     light  Pro  #065F46 on #ECFDF5 = 7.6:1   text #0F172A on #FFFFFF = 17:1   muted #475569 on #FFFFFF = 7.6:1
+     dark   Pro  #6EE7B7 on #0B2A22 = 10.9:1  text #F1F5F9 on #111827 = 16:1   muted #CBD5E1 on #111827 = 12:1 */
+:root, html[data-theme="light"] {
+  --mdo-c-fg: #0F172A;
+  --mdo-c-muted: #475569;
+  --mdo-c-bg: #FFFFFF;
+  --mdo-c-surface: #F1F5F9;
+  --mdo-c-border: #CBD5E1;
+  --mdo-c-pro-fg: #065F46;
+  --mdo-c-pro-bg: #ECFDF5;
+  --mdo-c-pro-border: #047857;
+  --mdo-c-focus: #047857;
+  --mdo-c-shadow: 0 10px 30px rgba(15, 23, 42, 0.14);
+}
+html[data-theme="dark"] {
+  --mdo-c-fg: #F1F5F9;
+  --mdo-c-muted: #CBD5E1;
+  --mdo-c-bg: #111827;
+  --mdo-c-surface: #1E293B;
+  --mdo-c-border: #334155;
+  --mdo-c-pro-fg: #6EE7B7;
+  --mdo-c-pro-bg: #0B2A22;
+  --mdo-c-pro-border: #34D399;
+  --mdo-c-focus: #34D399;
+  --mdo-c-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+html[data-theme="light"] { color-scheme: light; }
+html[data-theme="dark"] { color-scheme: dark; }
+
+.mdo-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+  font-family: var(--font-body, 'DM Sans', system-ui, sans-serif);
+}
+
+/* Pro (coming soon) — an upgrade control, not a tool tab */
+.mdo-actions .mdo-pro {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1.5px solid var(--mdo-c-pro-border);
+  border-radius: 999px;
+  background: var(--mdo-c-pro-bg);
+  color: var(--mdo-c-pro-fg);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 160ms, color 160ms;
+}
+.mdo-actions .mdo-pro:hover { background: var(--mdo-c-pro-border); color: var(--mdo-c-bg); }
+.mdo-actions .mdo-pro .mdo-pro-note { font-weight: 500; }
+.mdo-actions .mdo-pro .mdo-pro-note:empty { display: none; }
+
+/* Theme toggle + account button: 44x44 icon buttons */
+.mdo-actions .mdo-theme,
+.mdo-actions .mdo-acct-btn,
+.mdo-actions .mdo-signin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1.5px solid var(--mdo-c-border);
+  border-radius: 10px;
+  background: var(--mdo-c-bg);
+  color: var(--mdo-c-fg);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 160ms, background 160ms;
+}
+.mdo-actions .mdo-signin, .mdo-actions .mdo-acct-btn { padding: 0 12px; }
+.mdo-actions .mdo-theme:hover, .mdo-actions .mdo-acct-btn:hover, .mdo-actions .mdo-signin:hover { border-color: var(--mdo-c-pro-border); background: var(--mdo-c-surface); }
+.mdo-actions .mdo-pro:focus-visible, .mdo-actions .mdo-theme:focus-visible, .mdo-actions .mdo-acct-btn:focus-visible,
+.mdo-actions .mdo-signin:focus-visible, .mdo-actions .mdo-acct-item:focus-visible {
+  outline: 3px solid var(--mdo-c-focus);
+  outline-offset: 2px;
+}
+.mdo-actions .mdo-i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+html[data-theme="dark"] .mdo-actions .mdo-i-moon,
+html:not([data-theme="dark"]) .mdo-actions .mdo-i-sun { display: none; }
+
+/* Account menu */
+.mdo-actions .mdo-account { position: relative; }
+.mdo-actions .mdo-account[hidden] { display: none; }
+.mdo-actions .mdo-avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--mdo-c-pro-bg); color: var(--mdo-c-pro-fg); border: 1px solid var(--mdo-c-pro-border);
+  font-size: 0.8rem; font-weight: 700;
+}
+.mdo-actions .mdo-acct-menu {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 1000;
+  min-width: 220px; max-width: min(320px, calc(100vw - 32px));
+  padding: 8px; border: 1px solid var(--mdo-c-border); border-radius: 12px;
+  background: var(--mdo-c-bg); color: var(--mdo-c-fg); box-shadow: var(--mdo-c-shadow);
+  text-align: left;
+}
+.mdo-actions .mdo-acct-menu[hidden] { display: none; }
+.mdo-actions .mdo-acct-who { margin: 4px 8px 8px; font-size: 0.8rem; color: var(--mdo-c-muted); overflow-wrap: anywhere; }
+.mdo-actions .mdo-acct-who strong { color: var(--mdo-c-fg); font-weight: 600; }
+.mdo-actions .mdo-acct-item {
+  display: flex; align-items: center; width: 100%; min-height: 44px; padding: 0 10px;
+  border: 0; border-radius: 8px; background: transparent; color: var(--mdo-c-fg);
+  font: inherit; font-size: 0.88rem; text-decoration: none; text-align: left; cursor: pointer;
+}
+.mdo-actions .mdo-acct-item:hover { background: var(--mdo-c-surface); }
+
+/* Phones: keep the cluster on the logo row; shorten the Pro label visually but keep the full text for AT */
+@media (max-width: 640px) {
+  .mdo-actions { gap: 6px; }
+  .mdo-actions .mdo-pro { padding: 0 10px; font-size: 0.74rem; flex-direction: column; justify-content: center; gap: 0; }
+  .mdo-actions .mdo-pro .mdo-pro-star { display: none; }
+  .mdo-actions .mdo-pro .mdo-pro-note { font-size: 0.68rem; }
+  .mdo-actions .mdo-acct-label { display: none; }
+  .mdo-actions .mdo-acct-btn { padding: 0; }
+}
+
+/* A real subscriber's badge (paywallUI proBadge / pro.js) lives in the cluster; #FFF on #047857 = 5.5:1 */
+.mdo-actions .pro-badge {
+  display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 999px;
+  background: #047857; color: #FFFFFF; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; white-space: nowrap;
+}
+
+/* Template rule for glyph-only tool buttons (copy / regenerate / delete / close) on every MDOThree tool:
+   44x44 tap targets. Their aria-label doubles as the visible tooltip (site-chrome.js copies it to title). */
+.btn-icon, .copy-btn, .copy-hex-btn, .del-btn, .pw-close, .btn-icon-sm {
+  min-width: 44px; min-height: 44px;
+  display: inline-flex; align-items: center; justify-content: center;
+}

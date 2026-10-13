@@ -206,3 +206,52 @@ nav.footer-legal a { display: inline-flex; align-items: center; min-height: 44px
   .del-btn { min-width: 44px !important; min-height: 44px !important; }
   nav.footer-legal a { min-width: 44px; justify-content: center; }
 }
+
+/* ============================================================
+   MDOThree shared template: dark theme + nav cluster
+   html[data-theme] is set before paint by /js/theme-init.js (saved choice, else the OS) and switched by the
+   nav toggle (/js/site-chrome.js). Light stays the palette above. Dark (WCAG AA):
+     text #F1F5F9 on #0B1120 = 17:1 · muted #A8B5C7 on #111827 = 8.3:1, on #1E293B = 6.6:1
+     emerald text #34D399 on #111827 = 9.3:1 · button: #022C22 on #34D399 = 9.6:1
+   ============================================================ */
+html[data-theme="dark"] {
+  --emerald: #34D399;
+  --emerald-dark: #6EE7B7;
+  --bg: #0B1120;
+  --surface: #1E293B;
+  --text-primary: #F1F5F9;
+  --text-secondary: #A8B5C7;
+  --border: #334155;
+  --card-bg: #111827;
+  --danger: #F87171;
+  --warn: #FBBF24;
+}
+html[data-theme="dark"] .logo .dot { color: #34D399; }
+html[data-theme="dark"] .btn-primary,
+html[data-theme="dark"] .btn-primary:hover { color: #022C22; }
+html[data-theme="dark"] nav.footer-legal,
+html[data-theme="dark"] nav.footer-legal a { color: #A8B5C7; }
+html[data-theme="dark"] .field-error { color: #FCA5A5; }
+html[data-theme="dark"] .skip-link { background: #F1F5F9; color: #0B1120; }
+html[data-theme="dark"] .toast { background: #F1F5F9; color: #0B1120; }
+html[data-theme="dark"] .input-field,
+html[data-theme="dark"] input, html[data-theme="dark"] select, html[data-theme="dark"] textarea { color-scheme: dark; }
+/* paywallUI.js injects light-only modal/lock styles; give them dark surfaces */
+html[data-theme="dark"] .pro-gate-lock { background: rgba(11,17,32,0.86); border-color: #334155; }
+html[data-theme="dark"] .pro-gate-lock-label { color: #F1F5F9; }
+
+/* Nav cluster [Pro (coming soon)] [account] [theme toggle]: right end of the header row */
+.site-header .mdo-actions { margin-left: auto; }
+.site-header .pro-badge { white-space: nowrap; }
+.mdo-actions:has(.pro-badge) .mdo-pro { display: none; }   /* a real subscriber sees their Pro badge, not the upsell */
+@media (max-width: 640px) {
+  .site-header { flex-wrap: wrap; height: auto; min-height: 56px; padding-top: 6px; padding-bottom: 6px; row-gap: 4px; overflow-x: visible; }
+  .site-header .mdo-actions { order: 2; }
+  .site-header .tool-nav { order: 3; flex: 1 1 100%; flex-wrap: wrap; overflow-x: visible; min-width: 0; }
+}
+/* Standalone 404: the cluster floats top right */
+.mdo-actions--float { position: absolute; top: 12px; right: 16px; }
+/* The upgrade dialog (paywallUI.js) is a light card in both themes: pin its body text dark so it never
+   inherits the dark theme's light text (#0F172A on #FFF = 17:1; legal/muted #475569 = 7.6:1). */
+.pw-modal { color: #0F172A; }
+.pw-modal .pw-legal { color: #475569; }

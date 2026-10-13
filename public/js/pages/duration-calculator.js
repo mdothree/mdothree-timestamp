@@ -10,10 +10,10 @@ initSubscription();
 handleStripeReturn();
 // Pro badge only for a real Pro entitlement (anonymous sign-in is not Pro).
 onSubscriptionChange(status => {
-  const nav = document.querySelector('.tool-nav');
+  const nav = document.querySelector('.mdo-actions');
   if (!nav) return;
   const existing = nav.querySelector('.pro-badge');
-  if (status.isPro && !existing) nav.appendChild(proBadge());
+  if (status.isPro && !existing) nav.insertBefore(proBadge(), nav.querySelector('[data-mdo-account]'));
   else if (!status.isPro && existing) existing.remove();
 });
 

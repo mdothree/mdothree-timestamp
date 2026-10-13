@@ -7,25 +7,19 @@ import {
   loadConversionHistory,
   deleteConversionEntry,
 } from './services/conversionStorage.js';
-import { onAuthChange, ensureAnonymousUser } from './config/config.js';
+import { ensureAnonymousUser } from './config/config.js';
 import { initSubscription, onSubscriptionChange } from './services/subscriptionService.js';
 import { proGate, proBadge, handleStripeReturn } from './services/paywallUI.js';
 initSubscription();
 handleStripeReturn();
 onSubscriptionChange(status => {
-  const nav = document.querySelector('.tool-nav');
+  const nav = document.querySelector('.mdo-actions');
   if (!nav) return;
   const existing = nav.querySelector('.pro-badge');
-  if (status.isPro && !existing) nav.appendChild(proBadge());
+  if (status.isPro && !existing) nav.insertBefore(proBadge(), nav.querySelector('[data-mdo-account]'));
   else if (!status.isPro && existing) existing.remove();
 });
 
-// ---- Auth badge ----
-const authBadge = Object.assign(document.createElement('div'), {
-  style: 'position:fixed;bottom:16px;right:16px;font-size:0.72rem;color:var(--text-secondary);font-family:var(--font-mono);z-index:999',
-});
-document.body.appendChild(authBadge);
-onAuthChange(u => { authBadge.textContent = (u && !u.isAnonymous) ? '● signed in' : ''; }); // anon guests see no badge
 ensureAnonymousUser().then(() => loadAndRenderHistory());
 
 // ---- Live timestamp ----
