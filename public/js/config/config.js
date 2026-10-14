@@ -252,6 +252,9 @@ export const STRIPE_CONFIG = {
   priceIdMonthly: CONFIG.priceIdMonthly || CONFIG.STRIPE_PRICE_ID_MONTHLY || '',
   priceIdYearly:  CONFIG.priceIdYearly  || CONFIG.STRIPE_PRICE_ID_YEARLY  || '',
   portalUrl:      CONFIG.portalUrl      || CONFIG.STRIPE_CUSTOMER_PORTAL_URL || '#',
+  // mdothree-api Cloud Functions base, e.g. https://us-central1-<project>.cloudfunctions.net
+  // (stripe-config meta). Empty = checkout fails closed with an honest message.
+  functionsBaseUrl: CONFIG.functionsBaseUrl || CONFIG.FIREBASE_FUNCTION_BASE_URL || '',
 };
 
 export const IS_TEST_MODE = STRIPE_CONFIG.publishableKey.startsWith('pk_test_');

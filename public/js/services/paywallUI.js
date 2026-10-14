@@ -4,23 +4,10 @@
 
 import { isPro, isProAsync, onSubscriptionChange, refreshSubscription } from './subscriptionService.js';
 import { STRIPE_CONFIG, PLANS, proFeatureLabel, PRO_CHECKOUT_ENABLED } from '../config/config.js';
-import { getFirebaseAuth, ensureAnonymousUser, loadFirebase } from '../config/config.js';
-
-// ---- Stripe.js lazy-load ----
-let _stripe = null;
-async function loadStripe() {
-  if (_stripe) return _stripe;
-  if (!window.Stripe) {
-    await new Promise((res, rej) => {
-      const s = document.createElement('script');
-      s.src = 'https://js.stripe.com/v3/';
-      s.onload = res; s.onerror = rej;
-      document.head.appendChild(s);
-    });
-  }
-  _stripe = window.Stripe(STRIPE_CONFIG.publishableKey);
-  return _stripe;
-}
+import { getFirebaseAuth, loadFirebase } from '../config/config.js';
+// mdothree-api client: Bearer <Firebase ID token>, guests refused, no uid in bodies,
+// {success:false,error,code} mapped to honest messages (hardened API 883dbfc).
+import { createCheckout, signedInUser, ProApiError, proErrorMessage } from '../pro-api.js';
 
 
 // ── Stripe test mode banner ──────────────────────────────────
@@ -208,7 +195,6 @@ function injectStyles() {
 
 // ---- Modal state ----
 let _modalEl     = null;
-let _elements    = null;
 let _selectedPlan = 'monthly';
 
 /**
@@ -256,8 +242,8 @@ export async function openUpgradeModal(featureId = '') {
           <li class="pw-perk"><span class="pw-perk-icon">✓</span><span><strong>Priority support</strong> — feature requests and bug reports prioritised</span></li>
         </ul>
 
-        <!-- Stripe Payment Element mount point -->
-        <div id="pw-payment-element" class="pw-loading"></div>
+        <!-- Checkout status (payment itself happens on Stripe's hosted Checkout page) -->
+        <div id="pw-payment-element" class="pw-loading" role="status"></div>
         <div class="pw-error" id="pw-error"></div>
 
         <button class="pw-submit" id="pw-submit-btn" disabled>
@@ -308,129 +294,63 @@ export async function openUpgradeModal(featureId = '') {
     updateSubmitLabel();
   });
 
-  // Mount Stripe Elements
-  await mountStripeElements();
+  await prepareCheckout();
 
   function updateSubmitLabel() {
-    const label = _selectedPlan === 'yearly'
-      ? 'Subscribe — $36/year (billed now)'
-      : 'Subscribe — $4/month';
-    document.getElementById('pw-submit-label').textContent = label;
+    const btn = document.getElementById('pw-submit-btn');
+    if (btn && !btn.disabled) document.getElementById('pw-submit-label').textContent = submitLabel();
   }
 }
 
-async function mountStripeElements() {
-  const stripe = await loadStripe().catch(() => null);
-  if (!stripe) {
-    document.getElementById('pw-payment-element').textContent = 'Payment unavailable. Please try again later.';
-    return;
-  }
+function submitLabel() {
+  return _selectedPlan === 'yearly'
+    ? 'Continue to checkout — $36/year (billed now)'
+    : 'Continue to checkout — $4/month';
+}
 
-  // Get current user's email for Stripe (optional)
-  const user  = getFirebaseAuth().currentUser;
-  const email = user?.email ?? undefined;
-
-  // Create a SetupIntent or PaymentIntent via your Cloud Function
-  // Get Firebase ID token for server-side auth verification
-  let idToken = '';
-  try { if (user) idToken = await user.getIdToken(); } catch { /* anon */ }
-
-  let clientSecret;
-  try {
-    const res = await fetch('/api/stripe/create-setup-intent', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(idToken ? { 'Authorization': `Bearer ${idToken}` } : {}),
-      },
-      body: JSON.stringify({ uid: user?.uid, email, plan: _selectedPlan }),
-    });
-    const data = await res.json();
-    clientSecret = data.clientSecret;
-  } catch {
-    // Can't reach backend — show fallback Stripe Checkout link
-    const mountEl = document.getElementById('pw-payment-element');
-    mountEl.classList.remove('pw-loading');
-    mountEl.innerHTML = `
-      <div style="text-align:center;padding:16px 0">
-        <p style="font-size:0.875rem;color:#475569;margin-bottom:12px">Click below to complete your subscription securely via Stripe Checkout.</p>
-      </div>
-    `;
-    const submitBtn = document.getElementById('pw-submit-btn');
-    submitBtn.disabled = false;
-    document.getElementById('pw-submit-label').textContent = 'Continue to Checkout →';
-    submitBtn.addEventListener('click', () => {
-      const priceId = _selectedPlan === 'yearly'
-        ? STRIPE_CONFIG.priceIdYearly
-        : STRIPE_CONFIG.priceIdMonthly;
-      window.location.href = `https://buy.stripe.com/${priceId}?client_reference_id=${user?.uid ?? ''}`;
-    });
-    return;
-  }
-
-  // Mount Stripe Payment Element
-  _elements = stripe.elements({ clientSecret, appearance: stripeAppearance() });
-  const paymentEl = _elements.create('payment', { layout: 'tabs' });
-  const mountEl   = document.getElementById('pw-payment-element');
-  mountEl.classList.remove('pw-loading');
-  mountEl.innerHTML = '';
-  paymentEl.mount(mountEl);
-
+// Hosted Stripe Checkout through the hardened API (createCheckoutSession, Bearer ID token).
+// The plan is read when the button is pressed; the server fixes the price and the
+// success/cancel URLs (https://mdothree.com/success). Guests are asked to sign in.
+async function prepareCheckout() {
+  const statusEl  = document.getElementById('pw-payment-element');
   const submitBtn = document.getElementById('pw-submit-btn');
+  const errorEl   = document.getElementById('pw-error');
+  const labelEl   = document.getElementById('pw-submit-label');
+
+  await loadFirebase(); // PERF-002: loaded here, when the Pro UI opens
+  statusEl.classList.remove('pw-loading');
+  if (!signedInUser(getFirebaseAuth())) {
+    statusEl.textContent = proErrorMessage(401, 'sign_in_required');
+    submitBtn.disabled = true;
+    submitBtn.setAttribute('aria-disabled', 'true');
+    labelEl.textContent = 'Sign in to subscribe';
+    return;
+  }
+
+  statusEl.textContent = "You'll pay on Stripe's secure checkout page, then come back to mdothree.com.";
   submitBtn.disabled = false;
-  document.getElementById('pw-submit-label').textContent =
-    _selectedPlan === 'yearly' ? 'Subscribe — $36/year' : 'Subscribe — $4/month';
+  labelEl.textContent = submitLabel();
 
   submitBtn.addEventListener('click', async () => {
     submitBtn.disabled = true;
-    document.getElementById('pw-submit-label').textContent = 'Processing…';
-    document.getElementById('pw-error').textContent = '';
-
-    const { error } = await stripe.confirmPayment({
-      elements:      _elements,
-      confirmParams: {
-        return_url: window.location.href + '?stripe_success=1',
-      },
-    });
-
-    if (error) {
-      document.getElementById('pw-error').textContent = error.message;
+    labelEl.textContent = 'Opening secure checkout…';
+    errorEl.textContent = '';
+    try {
+      const url = await createCheckout(_selectedPlan, {
+        baseUrl: STRIPE_CONFIG.functionsBaseUrl,
+        auth: getFirebaseAuth(),
+      });
+      window.location.assign(url);
+    } catch (e) {
+      errorEl.textContent = e instanceof ProApiError ? e.message : proErrorMessage(500, 'internal');
       submitBtn.disabled = false;
-      document.getElementById('pw-submit-label').textContent =
-        _selectedPlan === 'yearly' ? 'Subscribe — $36/year' : 'Subscribe — $4/month';
+      labelEl.textContent = submitLabel();
     }
-    // On success, Stripe redirects to return_url and the webhook updates Firestore
   });
 }
 
-function stripeAppearance() {
-  return {
-    theme: 'stripe',
-    variables: {
-      colorPrimary:       '#10B981',
-      colorBackground:    '#ffffff',
-      colorText:          '#0F172A',
-      colorDanger:        '#EF4444',
-      fontFamily:         '"DM Sans", system-ui, sans-serif',
-      borderRadius:       '8px',
-      spacingUnit:        '4px',
-    },
-    rules: {
-      '.Input': {
-        border:    '1.5px solid #CBD5E1',
-        boxShadow: 'none',
-      },
-      '.Input:focus': {
-        border:    '1.5px solid #10B981',
-        boxShadow: '0 0 0 3px rgba(16,185,129,0.12)',
-      },
-      '.Label': { fontWeight: '600', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.08em' },
-    },
-  };
-}
-
 export function closeUpgradeModal() {
-  if (_modalEl) { _modalEl.remove(); _modalEl = null; _elements = null; }
+  if (_modalEl) { _modalEl.remove(); _modalEl = null; }
 }
 
 // ---- Handle Stripe redirect success ----
