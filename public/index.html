@@ -69,6 +69,7 @@
       <p>Convert between Unix timestamps and human-readable dates. Current epoch time updates live.</p>
     </div>
 
+    <p class="mdo-load-status" id="mdoLoadStatus" role="status">Loading tool…</p>
     <div class="tool-body">
       <!-- Live timestamp -->
       <div class="live-card">
@@ -87,11 +88,11 @@
             <option value="s">Seconds</option>
             <option value="ms">Milliseconds</option>
           </select>
-          <button class="btn-primary" id="tsToDate">Convert</button>
+          <button class="btn-primary" id="tsToDate" disabled aria-busy="true" data-mdo-wait>Convert</button>
         </div>
         <p class="unit-notice" id="tsUnitNotice" role="status" hidden></p>
         <div class="output-panel" id="tsDateOutput" style="display:none">
-          <div id="tsDateRows"></div>
+          <div id="tsDateRows" role="status" aria-live="polite"></div>
         </div>
       </div>
 
@@ -102,10 +103,10 @@
         <div class="converter-title">Date / Time → Unix Timestamp</div>
         <div class="converter-row" style="flex-wrap:wrap">
           <input aria-label="Date and time to convert" type="datetime-local" id="dateInput" class="input-field" />
-          <button class="btn-primary" id="dateToTs">Convert</button>
+          <button class="btn-primary" id="dateToTs" disabled aria-busy="true" data-mdo-wait>Convert</button>
         </div>
         <div class="output-panel" id="dateOutput" style="display:none">
-          <div id="dateRows"></div>
+          <div id="dateRows" role="status" aria-live="polite"></div>
         </div>
       </div>
     </div>

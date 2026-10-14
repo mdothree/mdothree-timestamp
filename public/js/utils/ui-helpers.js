@@ -73,6 +73,8 @@ export function showToast(message, type = 'info', duration = 2500) {
   if (!toast) {
     toast = document.createElement('div');
     toast.id = '__mdothree_toast';
+    toast.setAttribute('role', 'status'); // HID-003: copy results/failures are announced
+    toast.setAttribute('aria-live', 'polite');
     Object.assign(toast.style, {
       position:       'fixed',
       bottom:         '24px',

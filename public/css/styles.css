@@ -255,3 +255,14 @@ html[data-theme="dark"] .pro-gate-lock-label { color: #F1F5F9; }
    inherits the dark theme's light text (#0F172A on #FFF = 17:1; legal/muted #475569 = 7.6:1). */
 .pw-modal { color: #0F172A; }
 .pw-modal .pw-legal { color: #475569; }
+
+/* HID-017: "Loading tool…" + disabled actions until the page script has bound its handlers (slow connections) */
+.mdo-load-status{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:.85rem;color:var(--text-secondary,#475569)}
+.mdo-load-status::before{content:"";flex:none;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:mdo-spin .8s linear infinite}
+@keyframes mdo-spin{to{transform:rotate(360deg)}}
+[data-mdo-wait]{cursor:progress;opacity:.6}
+/* HID-005: honour reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .mdo-load-status::before{animation:none;border-right-color:currentColor;opacity:.5}
+}

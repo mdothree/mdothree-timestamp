@@ -1,6 +1,6 @@
 // js/app.js — mdothree-timestamp (Firebase-integrated)
 
-import { unixToFormats, dateToFormats, detectUnit, UNIT_NAMES } from './services/timestampConverter.js';
+import { unixToFormats, dateToFormats, detectUnit, UNIT_NAMES, LOCAL_ROWS, userLocale } from './services/timestampConverter.js';
 import { copyToClipboard, showToast }      from './utils/dateUtils.js';
 import {
   logConversion,
@@ -113,6 +113,13 @@ function renderFormats(rowsId, panelId, formats) {
     val.className = 'output-row-value';
     val.title = 'Click to copy';
     val.textContent = value;
+    if (LOCAL_ROWS.has(label)) {
+      // HID-016: say which locale the value is in, and mark its language/direction so mixed scripts render correctly.
+      const loc = userLocale();
+      lab.textContent = `${label} (${loc})`;
+      val.lang = loc;
+      val.dir = 'auto';
+    }
     row.append(lab, val);
     row.querySelector('.output-row-value').addEventListener('click', async () => {
       showToast((await copyToClipboard(value)) ? label + ' copied!' : 'Copy failed');
@@ -173,3 +180,7 @@ async function loadAndRenderHistory() {
     list.appendChild(row);
   });
 }
+
+// HID-017: the page starts with "Loading tool…" and disabled actions; release them now that the handlers are bound.
+document.querySelectorAll('[data-mdo-wait]').forEach(el => { el.disabled = false; el.removeAttribute('aria-busy'); el.removeAttribute('data-mdo-wait'); });
+document.getElementById('mdoLoadStatus')?.remove();

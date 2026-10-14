@@ -6,7 +6,7 @@
     "dev": "node scripts/inject-config.cjs && npx serve public",
     "build": "node scripts/inject-config.cjs",
     "start": "npx serve public",
-    "test": "node --test --experimental-vm-modules tests/durationCalculator.test.js tests/cronParser.test.js tests/shared-parity.test.mjs",
+    "test": "node --test --experimental-vm-modules tests/durationCalculator.test.js tests/cronParser.test.js tests/locale.test.js tests/shared-parity.test.mjs",
     "check": "node scripts/check-imports.mjs public/js"
   },
   "devDependencies": {
