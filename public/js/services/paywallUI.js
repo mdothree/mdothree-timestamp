@@ -298,7 +298,7 @@ export async function openUpgradeModal(featureId = '') {
 
   function updateSubmitLabel() {
     const btn = document.getElementById('pw-submit-btn');
-    if (btn && !btn.disabled) document.getElementById('pw-submit-label').textContent = submitLabel();
+    if (btn && !btn.disabled && signedInUser(getFirebaseAuth())) document.getElementById('pw-submit-label').textContent = submitLabel();
   }
 }
 
@@ -319,19 +319,32 @@ async function prepareCheckout() {
 
   await loadFirebase(); // PERF-002: loaded here, when the Pro UI opens
   statusEl.classList.remove('pw-loading');
-  if (!signedInUser(getFirebaseAuth())) {
-    statusEl.textContent = proErrorMessage(401, 'sign_in_required');
-    submitBtn.disabled = true;
-    submitBtn.setAttribute('aria-disabled', 'true');
-    labelEl.textContent = 'Sign in to subscribe';
-    return;
-  }
-
-  statusEl.textContent = "You'll pay on Stripe's secure checkout page, then come back to mdothree.com.";
-  submitBtn.disabled = false;
-  labelEl.textContent = submitLabel();
+  const SIGN_IN_LABEL = 'Sign in to subscribe';
+  const showState = () => {
+    if (signedInUser(getFirebaseAuth())) {
+      statusEl.textContent = "You'll pay on Stripe's secure checkout page, then come back to mdothree.com.";
+      labelEl.textContent = submitLabel();
+    } else {
+      statusEl.textContent = proErrorMessage(401, 'sign_in_required');
+      labelEl.textContent = SIGN_IN_LABEL;
+    }
+    submitBtn.disabled = false;
+    submitBtn.removeAttribute('aria-disabled');
+  };
+  showState();
 
   submitBtn.addEventListener('click', async () => {
+    if (!signedInUser(getFirebaseAuth())) {
+      // Sign in or create an account first (js/auth-ui.js, loaded now). A guest session is linked to the
+      // new account, so history saved here carries over.
+      const { openSignIn } = await import('../auth-nav.js');
+      const signed = await openSignIn({ reason: 'Pro belongs to your mdothree account. Sign in or create one, then continue to checkout.' }).catch(() => null);
+      if (!signed || !signedInUser(getFirebaseAuth())) { showState(); return; }
+      const status = await refreshSubscription();
+      if (status && status.isPro) { closeUpgradeModal(); showProSuccessToast(); return; }   // already Pro
+      showState();
+      return;   // signed in: the next press goes to checkout with the plan shown
+    }
     submitBtn.disabled = true;
     labelEl.textContent = 'Opening secure checkout…';
     errorEl.textContent = '';

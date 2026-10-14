@@ -18,6 +18,7 @@
 //   FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID,
 //   STRIPE_PUBLISHABLE_KEY, STRIPE_PRICE_ID_MONTHLY, STRIPE_PRICE_ID_YEARLY,
 //   STRIPE_CUSTOMER_PORTAL_URL
+//   FIREBASE_FUNCTION_BASE_URL   (mdothree-api base for js/pro-api.js)
 
 const fs   = require('fs');
 const path = require('path');
@@ -29,7 +30,7 @@ const firebaseKeys = [
 ];
 const stripeKeys = [
   'STRIPE_PUBLISHABLE_KEY', 'STRIPE_PRICE_ID_MONTHLY',
-  'STRIPE_PRICE_ID_YEARLY', 'STRIPE_CUSTOMER_PORTAL_URL', 'PRO_CHECKOUT_ENABLED',
+  'STRIPE_PRICE_ID_YEARLY', 'STRIPE_CUSTOMER_PORTAL_URL', 'PRO_CHECKOUT_ENABLED', 'FIREBASE_FUNCTION_BASE_URL',
 ];
 
 // A config group is only injected when at least one of its env vars is present.
@@ -55,6 +56,8 @@ if (haveStripeEnv) {
     priceIdMonthly: process.env.STRIPE_PRICE_ID_MONTHLY      || '',
     priceIdYearly:  process.env.STRIPE_PRICE_ID_YEARLY       || '',
     portalUrl:      process.env.STRIPE_CUSTOMER_PORTAL_URL   || '',
+    // mdothree-api Cloud Functions base (pro-api.js), e.g. https://us-central1-<project>.cloudfunctions.net
+    functionsBaseUrl: process.env.FIREBASE_FUNCTION_BASE_URL || '',
     PRO_CHECKOUT_ENABLED: process.env.PRO_CHECKOUT_ENABLED === 'true',  // #66b: closed unless exactly 'true'
   });
 }
