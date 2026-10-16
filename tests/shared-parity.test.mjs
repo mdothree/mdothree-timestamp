@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const PINNED = {
-  'auth-ui.js': 'e286a9af518964bd8e1a8aaaa419e8c46c43b3c4c0d44177537e1231a6f62a66',
+  'auth-ui.js': '3b4549802d52797b5f8fa8c4fc29a9671ab2c80154cf1265ca9f586c1c0521d4',
   'pro-api.js': '3d71c6ed0f074763cadf9394717d305bfbaabdeb260dfc16c32b81d46e58c4d4',
 };
 const js = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'public', 'js');

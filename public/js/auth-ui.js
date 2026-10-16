@@ -177,7 +177,7 @@ const COPY = {
   signup: { title: 'Create your mdothree account', submit: 'Create account', busy: 'Creating account…' },
   reset:  { title: 'Reset your password', submit: 'Send reset link', busy: 'Sending…' },
 };
-const INTRO = 'One mdothree account works on every mdothree tool. Pro is a paid subscription that belongs to your account.';
+const INTRO = 'One mdothree account works on every mdothree tool. mdothree Pro is a one-time lifetime purchase that belongs to your account.';
 const RESET_SENT = "If an account exists for that email, a reset link is on its way. Check your inbox and spam folder, then sign in with the new password.";
 const GUEST_LINK_NOTE = 'History saved in this browser moves to your new account.';
 const GUEST_SIGNIN_NOTE = 'Signing in to an existing account does not move history saved as a guest. To keep it, create an account instead.';
