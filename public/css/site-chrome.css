@@ -48,7 +48,7 @@ html[data-theme="dark"] { color-scheme: dark; }
   min-height: 44px;
   padding: 0 14px;
   border: 1.5px solid var(--mdo-c-pro-border);
-  border-radius: 999px;
+  border-radius: 4px;
   background: var(--mdo-c-pro-bg);
   color: var(--mdo-c-pro-fg);
   font-size: 0.8rem;
@@ -75,7 +75,7 @@ html[data-theme="dark"] { color-scheme: dark; }
   height: 44px;
   padding: 0;
   border: 1.5px solid var(--mdo-c-border);
-  border-radius: 10px;
+  border-radius: 4px;
   background: var(--mdo-c-bg);
   color: var(--mdo-c-fg);
   font: inherit;
@@ -107,7 +107,7 @@ html:not([data-theme="dark"]) .mdo-actions .mdo-i-sun { display: none; }
 .mdo-actions .mdo-acct-menu {
   position: absolute; right: 0; top: calc(100% + 8px); z-index: 1000;
   min-width: 220px; max-width: min(320px, calc(100vw - 32px));
-  padding: 8px; border: 1px solid var(--mdo-c-border); border-radius: 12px;
+  padding: 8px; border: 1px solid var(--mdo-c-border); border-radius: 4px;
   background: var(--mdo-c-bg); color: var(--mdo-c-fg); box-shadow: var(--mdo-c-shadow);
   text-align: left;
 }
@@ -116,7 +116,7 @@ html:not([data-theme="dark"]) .mdo-actions .mdo-i-sun { display: none; }
 .mdo-actions .mdo-acct-who strong { color: var(--mdo-c-fg); font-weight: 600; }
 .mdo-actions .mdo-acct-item {
   display: flex; align-items: center; width: 100%; min-height: 44px; padding: 0 10px;
-  border: 0; border-radius: 8px; background: transparent; color: var(--mdo-c-fg);
+  border: 0; border-radius: 4px; background: transparent; color: var(--mdo-c-fg);
   font: inherit; font-size: 0.88rem; text-decoration: none; text-align: left; cursor: pointer;
 }
 .mdo-actions .mdo-acct-item:hover { background: var(--mdo-c-surface); }
@@ -133,7 +133,7 @@ html:not([data-theme="dark"]) .mdo-actions .mdo-i-sun { display: none; }
 
 /* A real subscriber's badge (paywallUI proBadge / pro.js) lives in the cluster; #FFF on #047857 = 5.5:1 */
 .mdo-actions .pro-badge {
-  display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 999px;
+  display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 4px;
   background: #047857; color: #FFFFFF; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; white-space: nowrap;
 }
 
@@ -143,3 +143,33 @@ html:not([data-theme="dark"]) .mdo-actions .mdo-i-sun { display: none; }
   min-width: 44px; min-height: 44px;
   display: inline-flex; align-items: center; justify-content: center;
 }
+
+/* ── MDO3 funnel strip (shared/mdothree/funnel.html) ──────────────────────────
+   One quiet, full-bordered block near the foot of each tool page: a contextual line pointing at the
+   one paid MDO3 product that fits the tool, then the family row. Small corners, even borders, no badges. */
+.mdo-funnel {
+  max-width: 1100px;
+  margin: 48px auto 24px;
+  padding: 18px 20px;
+  border: 1px solid var(--mdo-c-border);
+  border-radius: 4px;
+  background: var(--mdo-c-bg);
+  color: var(--mdo-c-fg);
+  font-family: var(--font-body, 'DM Sans', system-ui, sans-serif);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.mdo-funnel-kicker {
+  margin: 0 0 6px;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mdo-c-muted);
+}
+.mdo-funnel-lead { margin: 0 0 10px; }
+.mdo-funnel a { color: var(--mdo-c-pro-fg); font-weight: 600; text-underline-offset: 3px; }
+.mdo-funnel a:focus-visible { outline: 3px solid var(--mdo-c-focus); outline-offset: 2px; }
+.mdo-funnel-family { margin: 0; color: var(--mdo-c-muted); font-size: 0.82rem; }
+.mdo-funnel-family a { color: inherit; font-weight: 500; }
+@media (max-width: 640px) { .mdo-funnel { margin: 32px 16px 16px; } }

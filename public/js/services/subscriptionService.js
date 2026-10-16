@@ -1,57 +1,57 @@
 // services/subscriptionService.js
-// Checks whether the current Firebase user has an active Pro subscription.
-// The source of truth is a Firestore doc written by the Stripe webhook Cloud Function.
-// Falls back gracefully (free tier) if Firebase or Firestore is unavailable.
+// Checks whether the current Firebase user owns mdothree Pro.
+// mdothree Pro is ONE lifetime purchase (DECISIONS 2026-10-16): $29 once, no subscription, never expires.
+// The source of truth is subscriptions/{uid}, written only by the Stripe webhook (Admin SDK; rules deny
+// client writes). The entitlement check is the shared hasProEntitlement() from pro-api.js.
+// Falls back gracefully (no Pro) if Firebase or Firestore is unavailable.
 
 import { getFirebaseAuth, getDB, onAuthChange, doc, getDoc } from '../config/config.js';
+import { hasProEntitlement } from '../pro-api.js';
 
 const SUBSCRIPTIONS_COL = 'subscriptions';
+const NO_PRO = Object.freeze({ isPro: false, plan: 'none' });
 
 // ---- In-memory cache ----
-let _cachedStatus = null;   // null | { isPro, plan, periodEnd, stripeCustomerId }
+let _cachedStatus = null;   // null | { isPro, plan, status, lifetime, stripeCustomerId }
 let _listeners    = [];
 
 // ---- Internal fetch ----
 async function fetchSubscriptionStatus(user) {
   const uid = user?.uid;
-  if (!uid) return { isPro: false, plan: 'free' };
+  if (!uid) return { ...NO_PRO };
   // Guest (anonymous) sessions are never Pro: their uid is per browser and per
-  // subdomain, and the API refuses to sell Pro to one (createSetupIntent).
-  if (user.isAnonymous) return { isPro: false, plan: 'free', reason: 'guest' };
+  // subdomain, and the API refuses to sell Pro to one (createCheckoutSession).
+  if (user.isAnonymous) return { ...NO_PRO, reason: 'guest' };
   try {
-    // Firebase is lazy/optional (HID-001): no SDK -> free tier, never a crash.
+    // Firebase is lazy/optional (HID-001): no SDK -> no Pro, never a crash.
     const db   = getDB();
-    if (!db) return { isPro: false, plan: 'free', reason: 'offline' };
+    if (!db) return { ...NO_PRO, reason: 'offline' };
     const ref  = doc(db, SUBSCRIPTIONS_COL, uid);
     const snap = await getDoc(ref);
-    if (!snap.exists()) return { isPro: false, plan: 'free' };
+    if (!snap.exists()) return { ...NO_PRO };
 
     const data = snap.data();
-    const now  = Date.now();
-    // Written only by the Stripe webhook (Admin SDK); rules deny client writes.
-    const periodEnd = data.currentPeriodEnd?.toMillis?.() ?? 0;
-    const active    = data.isPro === true
-                   && (data.status === 'active' || data.status === 'trialing')
-                   && periodEnd > now;
+    // Lifetime Pro: { isPro:true, plan:'pro', status:'lifetime', lifetime:true }.
+    // A refund or dispute clears it (webhook), so there is no date to check.
+    const pro = hasProEntitlement(data);
 
     return {
-      isPro:             active,
-      plan:              active ? 'pro' : 'free',
-      status:            data.status,
-      periodEnd:         new Date(periodEnd),
-      stripeCustomerId:  data.stripeCustomerId ?? null,
-      cancelAtPeriodEnd: data.cancelAtPeriodEnd ?? false,
+      isPro:            pro,
+      plan:             pro ? 'pro' : 'none',
+      status:           data.status ?? null,
+      lifetime:         pro,
+      stripeCustomerId: data.stripeCustomerId ?? null,
     };
   } catch (e) {
     console.warn('[subscriptionService] fetch failed:', e.message);
-    return { isPro: false, plan: 'free' };
+    return { ...NO_PRO };
   }
 }
 
 // ---- Public API ----
 
 /**
- * Initialise subscription watcher. Call once per page.
+ * Initialise the Pro status watcher. Call once per page.
  * Re-checks whenever auth state changes.
  */
 export function initSubscription() {
@@ -60,14 +60,14 @@ export function initSubscription() {
     if (user) {
       _cachedStatus = await fetchSubscriptionStatus(user);
     } else {
-      _cachedStatus = { isPro: false, plan: 'free' };
+      _cachedStatus = { ...NO_PRO };
     }
     _listeners.forEach(cb => cb(_cachedStatus));
   });
 }
 
 /**
- * Register a listener called whenever subscription status changes.
+ * Register a listener called whenever Pro status changes.
  * @param {Function} cb - called with status object
  * @returns {Function} unsubscribe
  */
@@ -79,7 +79,7 @@ export function onSubscriptionChange(cb) {
 
 /**
  * Synchronously check Pro status from cache.
- * Returns false if not yet loaded (safe default = free tier).
+ * Returns false if not yet loaded (safe default = no Pro).
  */
 export function isPro() {
   return _cachedStatus?.isPro === true;
@@ -106,14 +106,14 @@ export async function isProAsync() {
 }
 
 /**
- * Get full subscription details.
+ * Get full Pro status details.
  */
 export function getSubscriptionStatus() {
-  return _cachedStatus ?? { isPro: false, plan: 'free' };
+  return _cachedStatus ?? { ...NO_PRO };
 }
 
 /**
- * Force a fresh fetch (e.g. after successful payment redirect).
+ * Force a fresh fetch (e.g. after returning from Stripe Checkout).
  */
 export async function refreshSubscription() {
   const user = getFirebaseAuth().currentUser;

@@ -11,7 +11,7 @@
 // unreachable (offline, corporate proxy, content blocker) the whole module graph
 // failed and every tool page was dead and silent. Now the tool core never depends
 // on Firebase: when the SDK cannot load, auth reports "no user", Pro features stay
-// on the free tier, and history falls back to this browser.
+// locked, and history falls back to this browser.
 //
 // PERF-002: the SDK is not even requested on a plain visit. It loads only when
 //   - this browser already has a Firebase session here (restored on load), or
@@ -249,8 +249,6 @@ export function onAuthChange(cb) {
 
 export const STRIPE_CONFIG = {
   publishableKey: CONFIG.publishableKey || CONFIG.STRIPE_PUBLISHABLE_KEY || '',
-  priceIdMonthly: CONFIG.priceIdMonthly || CONFIG.STRIPE_PRICE_ID_MONTHLY || '',
-  priceIdYearly:  CONFIG.priceIdYearly  || CONFIG.STRIPE_PRICE_ID_YEARLY  || '',
   portalUrl:      CONFIG.portalUrl      || CONFIG.STRIPE_CUSTOMER_PORTAL_URL || '#',
   // mdothree-api Cloud Functions base, e.g. https://us-central1-<project>.cloudfunctions.net
   // (stripe-config meta). Empty = checkout fails closed with an honest message.

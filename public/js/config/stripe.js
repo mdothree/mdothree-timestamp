@@ -1,6 +1,7 @@
-// config/stripe.js — mdothree shared Stripe config
-// Used by all frontend projects via copy or CDN import.
-// Stripe Publishable Key is safe to expose in frontend code.
+// config/stripe.js — mdothree Pro config for this tool.
+// mdothree Pro is ONE lifetime purchase (DECISIONS 2026-10-16): $29 once, no subscription, never expires.
+// The price is fixed on the server (createCheckoutSession, plan 'lifetime'); the values here are display only.
+// The publishable key is safe to expose in frontend code.
 
 // ---------------------------------------------------------------------------
 // Keys — injected from <meta name="stripe-config"> or window.__STRIPE_CONFIG
@@ -12,66 +13,38 @@ function loadStripeConfig() {
     if (meta) { try { return JSON.parse(meta.content); } catch {} }
   }
   return {
-    publishableKey: '',   // set via <meta name="stripe-config">; empty = checkout fails closed
-    priceIdMonthly: '',  // e.g. price_1ABC...
-    priceIdYearly:  '',   // e.g. price_1XYZ...
-    portalUrl:      '', // customer portal link
+    publishableKey:   '',   // set via <meta name="stripe-config">; empty = checkout fails closed
+    functionsBaseUrl: '',   // mdothree-api base; empty = checkout fails closed with an honest message
   };
 }
 
 export const STRIPE_CONFIG = loadStripeConfig();
 
 // ---------------------------------------------------------------------------
-// Plan definitions
+// The one Pro offer: a single lifetime purchase. No recurring plans.
 // ---------------------------------------------------------------------------
 export const PLANS = {
-  free: {
+  open: {
     name:  'Without Pro',
     color: '#64748B',
   },
   pro: {
     name:  'Pro',
-    price: '$4/mo',
-    yearly: '$36/yr',
+    price: '$29',
+    note:  'one payment, lifetime',
     color: '#10B981',
   },
 };
 
 // ---------------------------------------------------------------------------
-// Feature gate map — defines which features require Pro
-// Each key matches a feature ID checked via requiresPro(featureId)
+// Feature gate map: ONLY the features this tool really gates in code
+// (proGate('<id>') / openUpgradeModal('<id>') in public/js). The upgrade modal
+// lists exactly these labels, so keep them honest and in sync with the code.
 // ---------------------------------------------------------------------------
 export const PRO_FEATURES = {
-  // ---- Hash ----
-  'hash.bcrypt':          { label: 'bcrypt hashing',             tool: 'hash' },
-  'hash.hmac':            { label: 'HMAC generation',            tool: 'hash' },
-  'hash.batch':           { label: 'Batch hashing (>10 items)',  tool: 'hash' },
-  'hash.batch_unlimited': { label: 'Unlimited batch hashing',    tool: 'hash' },
-  'hash.favourites':      { label: 'Save hash favourites',       tool: 'hash' },
-  'hash.history':         { label: 'Hash history (>5 entries)',  tool: 'hash' },
-  'hash.file_check':      { label: 'File hash verification',     tool: 'hash' },
-
-  // ---- Password ----
-  'password.breach':      { label: 'Breach checker',             tool: 'password' },
-  'password.history':     { label: 'Password history (>5)',      tool: 'password' },
-  'password.passphrase':  { label: 'Passphrase generator',       tool: 'password' },
-  'password.bulk':        { label: 'Bulk generate (>5 at once)', tool: 'password' },
-  'password.bookmarklet': { label: 'Browser bookmarklet',        tool: 'password' },
-
-  // ---- Timestamp ----
-  'timestamp.cron':       { label: 'Cron expression parser',     tool: 'timestamp' },
-  'timestamp.presets':    { label: 'Saved timezone presets',     tool: 'timestamp' },
-  'timestamp.history':    { label: 'Conversion history',        tool: 'timestamp' },
-  'timestamp.business':   { label: 'Business days calculator',  tool: 'timestamp' },
-  'timestamp.bulk_export':{ label: 'Bulk export conversions',   tool: 'timestamp' },
-
-  // ---- Color ----
-  'color.palette_save':   { label: 'Save palettes',             tool: 'color' },
-  'color.palette_limit':  { label: 'More than 3 palettes',      tool: 'color' },
-  'color.export_formats': { label: 'Export CSS/SCSS/JSON',       tool: 'color' },
-  'color.colorblind':     { label: 'Colorblind simulator',       tool: 'color' },
-  'color.gradient':       { label: 'Gradient generator',         tool: 'color' },
-  'color.image_extract':  { label: 'Extract colors from image',  tool: 'color' },
+  'timestamp.cron':       { label: 'Cron expression parser',   tool: 'timestamp' },
+  'timestamp.business':   { label: 'Business days calculator', tool: 'timestamp' },
+  'timestamp.presets':    { label: 'Saved timezone presets',   tool: 'timestamp' },
 };
 
 // ---------------------------------------------------------------------------
