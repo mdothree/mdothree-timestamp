@@ -362,22 +362,22 @@ function injectStyles(d) {
   display:flex;align-items:center;justify-content:center;padding:16px}
 .mdo-auth{--a-bg:#fff;--a-fg:#0F172A;--a-mute:#475569;--a-line:#CBD5E1;--a-in:#F8FAFC;--a-acc:#047857;--a-acc-h:#065F46;--a-err:#B91C1C;--a-ok:#047857;
   position:relative;background:var(--a-bg);color:var(--a-fg);width:100%;max-width:400px;max-height:92vh;overflow-y:auto;
-  border-radius:16px;padding:28px 24px 20px;box-shadow:0 24px 80px rgba(0,0,0,.35);font-family:'DM Sans',system-ui,sans-serif;box-sizing:border-box}
+  border-radius:4px;padding:28px 24px 20px;box-shadow:0 24px 80px rgba(0,0,0,.35);font-family:'DM Sans',system-ui,sans-serif;box-sizing:border-box}
 :root[data-theme="dark"] .mdo-auth{--a-bg:#0F172A;--a-fg:#F1F5F9;--a-mute:#94A3B8;--a-line:#334155;--a-in:#1E293B;--a-acc:#10B981;--a-acc-h:#34D399;--a-err:#FCA5A5;--a-ok:#34D399}
 .mdo-auth *{box-sizing:border-box}
 .mdo-auth [hidden]{display:none!important}
-.mdo-auth-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:8px;border:0;background:transparent;color:var(--a-mute);cursor:pointer;font-size:1rem}
+.mdo-auth-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:4px;border:0;background:transparent;color:var(--a-mute);cursor:pointer;font-size:1rem}
 .mdo-auth-close:hover{color:var(--a-fg);background:var(--a-in)}
 .mdo-auth-title{font-size:1.25rem;margin:0 0 6px;font-weight:700;color:var(--a-fg)}
 .mdo-auth-intro{font-size:.85rem;color:var(--a-mute);margin:0 0 16px;line-height:1.45}
 .mdo-auth-form{display:flex;flex-direction:column;gap:6px}
 .mdo-auth-label{font-size:.8rem;font-weight:600;color:var(--a-fg);margin-top:6px}
-.mdo-auth input{width:100%;padding:10px 12px;font-size:16px;border:1px solid var(--a-line);border-radius:8px;background:var(--a-in);color:var(--a-fg)}
+.mdo-auth input{width:100%;padding:10px 12px;font-size:16px;border:1px solid var(--a-line);border-radius:4px;background:var(--a-in);color:var(--a-fg)}
 .mdo-auth input:focus{outline:2px solid var(--a-acc);outline-offset:1px}
 .mdo-auth-hint,.mdo-auth-note{font-size:.75rem;color:var(--a-mute);margin:2px 0 0}
 .mdo-auth-msg{font-size:.82rem;color:var(--a-err);min-height:1.2em;margin:6px 0 0}
 .mdo-auth-msg.is-ok{color:var(--a-ok)}
-.mdo-auth-submit,.mdo-auth-google{width:100%;padding:12px;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:6px}
+.mdo-auth-submit,.mdo-auth-google{width:100%;padding:12px;border-radius:4px;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:6px}
 .mdo-auth-submit{border:0;background:var(--a-acc);color:#fff}
 :root[data-theme="dark"] .mdo-auth-submit{color:#020617}
 .mdo-auth-submit:hover:not(:disabled){background:var(--a-acc-h)}
