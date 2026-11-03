@@ -1,5 +1,5 @@
 // js/pages/business-days.js — Business Days Calculator (Pro)
-import { countBusinessDays, addBusinessDays, showToast } from '../utils/dateUtils.js';
+import { countBusinessDays, addBusinessDays, toLocalDate, formatDateOnly, showToast } from '../utils/dateUtils.js';
 import { withLoading, showToast as uiToast, showError } from '../utils/ui-helpers.js';
 import { initSubscription }                               from '../services/subscriptionService.js';
 import { proGate, lockElement, handleStripeReturn }       from '../services/paywallUI.js';
@@ -20,8 +20,8 @@ restoreSession();
 })();
 
 function initPage() {
-  const today = new Date().toISOString().split('T')[0];
-  const month = new Date(Date.now() + 30 * 24 * 3600000).toISOString().split('T')[0];
+  const today = formatDateOnly(new Date());
+  const month = formatDateOnly(new Date(Date.now() + 30 * 24 * 3600000));
 
   document.getElementById('bdStart').value    = today;
   document.getElementById('bdAddStart').value = today;
@@ -29,8 +29,8 @@ function initPage() {
 
   // Count business days
   document.getElementById('countBd').addEventListener('click', () => {
-    const start = new Date(document.getElementById('bdStart').value);
-    const end   = new Date(document.getElementById('bdEnd').value);
+    const start = toLocalDate(document.getElementById('bdStart').value);
+    const end   = toLocalDate(document.getElementById('bdEnd').value);
     if (isNaN(start) || isNaN(end)) return;
 
     const count  = countBusinessDays(start, end);
@@ -41,7 +41,7 @@ function initPage() {
 
   // Add business days
   document.getElementById('addBdBtn').addEventListener('click', () => {
-    const start = new Date(document.getElementById('bdAddStart').value);
+    const start = toLocalDate(document.getElementById('bdAddStart').value);
     const count = parseInt(document.getElementById('bdAddCount').value) || 30;
     if (isNaN(start)) return;
 
@@ -49,7 +49,7 @@ function initPage() {
     document.getElementById('bdAddResult').hidden = false;
     document.getElementById('bdAddVal').textContent =
       result.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) +
-      ' (' + result.toISOString().split('T')[0] + ')';
+      ' (' + formatDateOnly(result) + ')';
   });
 }
 
