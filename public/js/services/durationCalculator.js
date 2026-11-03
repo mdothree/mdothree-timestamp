@@ -21,23 +21,26 @@ export function calcDuration(start, end) {
   let d1 = s < e ? new Date(s) : new Date(e);
   let d2 = s < e ? new Date(e) : new Date(s);
 
-  let years  = d2.getFullYear() - d1.getFullYear();
-  let months = d2.getMonth() - d1.getMonth();
-  let days   = d2.getDate() - d1.getDate();
+  let years   = d2.getFullYear() - d1.getFullYear();
+  let months  = d2.getMonth() - d1.getMonth();
+  let days    = d2.getDate() - d1.getDate();
+  let hours   = d2.getHours() - d1.getHours();
+  let minutes = d2.getMinutes() - d1.getMinutes();
+  let seconds = d2.getSeconds() - d1.getSeconds();
 
+  // Borrow from the next larger unit so every component is non-negative
+  if (seconds < 0) { seconds += 60; minutes--; }
+  if (minutes < 0) { minutes += 60; hours--; }
+  if (hours < 0)   { hours += 24;   days--; }
   if (days < 0) {
     months--;
     days += new Date(d2.getFullYear(), d2.getMonth(), 0).getDate();
   }
   if (months < 0) { years--; months += 12; }
 
-  const hours   = d2.getHours() - d1.getHours();
-  const minutes = d2.getMinutes() - d1.getMinutes();
-  const seconds = d2.getSeconds() - d1.getSeconds();
-
   return {
     years, months, days,
-    hours: Math.abs(hours), minutes: Math.abs(minutes), seconds: Math.abs(seconds),
+    hours, minutes, seconds,
     totalMs, totalDays, totalHours, totalMinutes, totalSeconds,
   };
 }
