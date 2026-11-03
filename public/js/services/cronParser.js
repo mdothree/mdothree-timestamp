@@ -144,7 +144,7 @@ export function parseCron(expr) {
 export function getNextRuns(expr, count = 5, from = new Date()) {
   let c;
   try { c = compile(expr); } catch { return []; }
-  const { sets, domOrDow, domStar, dowStar } = c;
+  const { sets, domOrDow } = c;
   const months = new Set(sets.month), doms = new Set(sets.dayOfMonth), dows = new Set(sets.dayOfWeek);
 
   const start = new Date(from);
@@ -156,7 +156,7 @@ export function getNextRuns(expr, count = 5, from = new Date()) {
   for (let i = 0; i < 366 * 8 && results.length < count; i++, day.setDate(day.getDate() + 1)) {
     if (!months.has(day.getMonth() + 1)) continue;
     const domOk = doms.has(day.getDate()), dowOk = dows.has(day.getDay());
-    const dayOk = domOrDow ? (domOk || dowOk) : ((domStar || domOk) && (dowStar || dowOk));
+    const dayOk = domOrDow ? (domOk || dowOk) : (domOk && dowOk) // wildcard sets contain every value, so steps like */2 still restrict;
     if (!dayOk) continue;
     for (const h of sets.hour) {
       for (const m of sets.minute) {
